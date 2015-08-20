@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <html>
 
     <head>
@@ -8,7 +10,8 @@
         <script type="text/javascript" src="javascript/d3.tip.v0.6.3.js"></script>
         <script type="text/javascript" src="javascript/d3.js"></script>
         <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
-        <style type="text/css"> 
+
+        <style type="text/css">
             @import url("style.css?1.10.0");
         </style>
     </head>
@@ -17,9 +20,9 @@
             drawPreviews();">
 
         <form style="position: absolute; z-index: 1; background-color: #3d3d3d; color:#fff;" >
-            <input id="pro" type="radio" name="mode" value="proactive" onClick="proactive()" checked>Proactive
+            <input id="pro" type="radio" name="mode" value="proactive" onClick="proactive()">Proactive
             <br>
-            <input id="re" type="radio" name="mode" value="reactive" onClick="reactive()" >Reactive
+            <input id="re" type="radio" name="mode" value="reactive" onClick="reactive(1)" checked>Reactive
         </form> 
 
 
@@ -28,38 +31,16 @@
         <div id="map" style="position: absolute"></div>
 
         <!-- <button type="button" class="button" id="btn" onclick="changeMode()">Proactive</button>-->
-        <script type="text/javascript" >
-            // Create the Google Map?
+        <script type="text/javascript">
+            // Create the Google Mapâ¦
             var map = new google.maps.Map(d3.select("#map").node(), {
                 zoom: 11,
                 center: new google.maps.LatLng(41.859307, 12.596115), //center of rome
                 mapTypeId: google.maps.MapTypeId.ROADMAP
+                        //draggable : false
             });
-
-            var styles = [
-                {
-                    "featureType": "road",
-                    "elementType": "labels",
-                    "stylers": [
-                        {"visibility": "off"}
-                    ]
-                }, {
-                    "featureType": "poi",
-                    "stylers": [
-                        {"visibility": "off"}
-                    ]
-                }, {
-                    "featureType": "transit.station",
-                    "elementType": "labels",
-                    "stylers": [
-                        {"visibility": "off"}
-                    ]
-                }
-            ];
-
-            map.setOptions({styles: styles});
-//map.setOptions({scrollwheel: false});
-//redraw function on zoom
+            //map.setOptions({scrollwheel: false});
+            //redraw function on zoom
             google.maps.event.addListener(map, 'zoom_changed', function () {
                 var attack = d3.selectAll(".lineStaticAttack");
 
@@ -69,15 +50,15 @@
                 array.forEach(function (d) {
                     var id = d.id.match(/[0-9]+/)[0];
                     if (arrayID.indexOf(id) == -1)
-                        arrayID.push(id)
-                })
+                        arrayID.push(id);
+                });
 
                 attack.remove();
                 //redraw the arcs
                 arrayID.forEach(function (d) {
                     var json = "json attack/attack" + d + ".json";
                     createGraph(json, d, 0);
-                })
+                });
 
                 //instantiate version
                 var attack = d3.selectAll(".lineInstantiateAttack");
@@ -88,8 +69,8 @@
                 array.forEach(function (d) {
                     var id = d.id.match(/[0-9]+/)[0];
                     if (arrayID.indexOf(id) == -1)
-                        arrayID.push(id)
-                })
+                        arrayID.push(id);
+                });
 
                 attack.remove();
                 //delete previews
@@ -100,16 +81,16 @@
                 arrayID.forEach(function (d) {
                     var json = "json attack/attack" + d + ".json";
                     createGraph(json, d, 1);
-                })
+                });
                 /*
                  for(var i=1;i<7;i++)
                  drawFunc(i);*/
             });
-
             var h = parseInt(window.innerHeight),
                     w = parseInt(window.innerWidth),
-                    mode = 0, //0=proactive, 1=reactive
-                    overlay = 0,
+                    mode = 1, //0=proactive, 1=reactive
+                    alertIndex = 0;
+            overlay = 0,
                     sideFlag = 0, //0 open, 1 hidden
                     bottomFlag = 0, //0 open, 1 hidden
                     sizeLabel = 50,
@@ -117,9 +98,10 @@
                     borderAttackPreview = 2,
                     totalEdges = [],
                     totalNode = [],
+                    alertNodes = ["192.168.1.13", "192.168.1.12", "192.168.4.3", "192.168.2.4", "192.168.2.89", "192.168.1.9", "192.168.1.16", "192.168.1.1", "192.168.1.17"],
                     subnetList = [],
-                    queueSVG = [],
-                    wSideMenu = w * 0.20,
+                    queueSVG = [];
+            wSideMenu = w * 0.20,
                     hBottomMenu = h * 0.25,
                     width = wSideMenu,
                     height = wSideMenu,
@@ -142,13 +124,21 @@
                     wSVGPreview = wAttackPreview,
                     hPreviewDiv = 35,
                     likelihoodRank = [],
-                    idInstantiated = -1,
-                    hSVGPreview = hBottomMenu,
+                    idInstantiated = -1;
+            hSVGPreview = hBottomMenu,
                     json_file = "dati1.json";
 
-            document.getElementById('pro').checked = true;
 
-// Load the station data. When the data comes back, create an overlay.
+            var globalAttackEvolution = 0;
+            var cioppo;
+            var totalAttacks = [];
+            var totalResponse = [];
+            var barWidth = "10px";
+            var bheight = d3.scale.linear().domain([0, 10]).range([0, 50]);
+
+            document.getElementById('re').checked = true;
+
+            // Load the station data. When the data comes back, create an overlay.
 
             d3.json("dati1.json", function (source) {
                 overlay = new google.maps.OverlayView();
@@ -163,8 +153,9 @@
                 // Add the container when the overlay is added to the map.
                 overlay.onAdd = function () {
 
-                    //l'svg deve essere pi� grande dello schermo altrimenti taglia
-                    layer = d3.select(this.getPanes().overlayLayer)
+                    //l'svg deve essere piÃ¹ grande dello schermo altrimenti taglia
+                    //layer = d3.select(this.getPanes().overlayLayer)
+                    layer = d3.select(this.getPanes().overlayMouseTarget)
                             .append("svg")
                             .attr("class", "overlayedSVG")
                             .style("width", svgshifting * 2 + "px")
@@ -233,13 +224,48 @@
                                 .append("svg:path")
                                 .attr("d", "M0,-5L10,0L0,5");
 
+                        d3.selectAll(".line").remove();
+                        d3.selectAll(".barrier").remove();
+
                         var edges = layer.selectAll(".line")
                                 .data(totalEdges)
-                                .each(transformLine)
+                                //.each(transformLine)
                                 .enter()
-                                .append("line")
-                                .each(transformLine)
-                                .attr("class", "line"); //qui metteremo il peso degli archi
+                                .append("svg:path")
+                                //.each(transformLine)
+                                //.attr("d",transformLine)
+                                .attr("d", function (d) {
+                                    var d1 = new google.maps.LatLng(d.source.x, d.source.y);
+                                    var d2 = new google.maps.LatLng(d.target.x, d.target.y);
+                                    d1 = projection.fromLatLngToDivPixel(d1);
+                                    d2 = projection.fromLatLngToDivPixel(d2);
+                                    /*return d3.select(this)
+                                     .attr("x1", (d1.x + svgshifting))
+                                     .attr("y1", (d1.y + svgshifting))
+                                     .attr("x2", (d2.x + svgshifting))
+                                     .attr("y2", (d2.y + svgshifting));*/
+                                    var d1x = d1.x + svgshifting;
+                                    var d1y = d1.y + svgshifting;
+                                    var d2x = d2.x + svgshifting;
+                                    var d2y = d2.y + svgshifting;
+                                    return "M" + d1x + "," + d1y + "L" + d2x + "," + d2y;
+                                })
+                                .attr("class", "line") //qui metteremo il peso degli archi
+                                .attr("id", function (d) {
+                                    return "edge" + replacePoints(d.source.name) + "-" + replacePoints(d.target.name);
+                                });
+
+                        /*var riotta=d3.select("#edge192p168p1p2-192p168p1p1");
+                         var l=riotta.node().getTotalLength();
+                         var p = riotta.node().getPointAtLength(1.0 * l);
+                         //console.log(p);
+                         layer.append("circle")
+                         .attr("class","barrier")
+                         .attr("cx",p.x)
+                         .attr("cy",p.y)
+                         .attr("r",10)
+                         .style("fill","red")*/
+
 
                         var nodes = layer.selectAll(".node")
                                 .data(totalNode)
@@ -260,9 +286,21 @@
                                 .attr("y", padding)
                                 .attr("dy", ".31em")
                                 .text(function (d) {
-                                    return d.name
+                                    return d.name;
                                 });
 
+                        function replacePoints(string)
+                        {
+                            var res = "";
+                            for (l = 0; l < string.length; l++)
+                            {
+                                if (string[l] === ".")
+                                    res = res + "p";
+                                else
+                                    res = res + string[l];
+                            }
+                            return res;
+                        }
                         function transformNode(d) {
                             var n = d.name;
                             d = new google.maps.LatLng(d.x, d.y);
@@ -285,11 +323,16 @@
                             var d2 = new google.maps.LatLng(d.target.x, d.target.y);
                             d1 = projection.fromLatLngToDivPixel(d1);
                             d2 = projection.fromLatLngToDivPixel(d2);
-                            return d3.select(this)
-                                    .attr("x1", (d1.x + svgshifting))
-                                    .attr("y1", (d1.y + svgshifting))
-                                    .attr("x2", (d2.x + svgshifting))
-                                    .attr("y2", (d2.y + svgshifting));
+                            /*return d3.select(this)
+                             .attr("x1", (d1.x + svgshifting))
+                             .attr("y1", (d1.y + svgshifting))
+                             .attr("x2", (d2.x + svgshifting))
+                             .attr("y2", (d2.y + svgshifting));*/
+                            var d1x = d1.x + svgshifting;
+                            var d1y = d1.y + svgshifting;
+                            var d2x = d2.x + svgshifting;
+                            var d2y = d2.y + svgshifting;
+                            return "M" + d1x + "," + d1y + "L" + d2x + "," + d2y;
                         }
                         mm++;
                     };
@@ -299,7 +342,7 @@
 
                 //donut chart
 
-                // Bind our overlay to the map?
+                // Bind our overlay to the mapâ¦
                 overlay.setMap(map);
                 removeElements();
                 drawDonutChart();
@@ -308,10 +351,32 @@
             function drawPreviews() {
 
                 var time = 3000;
-                for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
+                if (mode == 0)
+                {
+                    var time = 3000;
+                    for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
 
-                    var myVar = setTimeout("drawFunc(" + indexOfPreview + ")", time);
-                    time = time + 5000;
+
+                        var myVar = setTimeout("drawFunc(" + indexOfPreview + ")", time);
+                        time = time + 5000;
+                    }
+                }
+                else
+                {
+                    var time = 0;
+                    var tt = 10000;
+                    for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
+
+
+                        var myVar = setTimeout("drawFuncReactive(" + indexOfPreview + ")", time);
+                        //time=time+5000;
+                    }
+                    for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
+
+                        var myVar = setTimeout("reactiveAlert(" + indexOfPreview + ")", tt);
+                        tt = tt + 5000;
+                    }
+
                 }
             }
 
@@ -319,6 +384,13 @@
                 d3.selectAll(".gmnoprint").remove();
                 d3.select(".gm-style-cc").remove();
                 d3.select("a").remove();
+            }
+
+            function removeAllElements() {
+                d3.selectAll(".gmnoprint").remove();
+                d3.select(".gm-style-cc").remove();
+                d3.select("a").remove();
+                d3.selectAll(".attackPreview").remove();
             }
 
             function createNodeList(source) {
@@ -336,7 +408,7 @@
                         d.vulnerabilities.forEach(function (x) {
                             patch += parseInt(x.patchability);
                             crit += parseFloat(x.score);
-                        })
+                        });
                     }
 
                     if (!check(subnetList, subnet)) {
@@ -367,7 +439,7 @@
                             totalEdges.push({
                                 source: i,
                                 target: j
-                            })
+                            });
                         j++;
                     });
                     i++;
@@ -416,7 +488,7 @@
                         .style("background-color", "#3d3d3d");
             }
 
-//creates bottom menu and associates for each div a svg
+            //creates bottom menu and associates for each div a svg
             function createBottomMenu(bottomMenu) {
                 bottomMenu.style("height", hBottomMenu + borderAttackPreview * 2 + "px")
                         .style("width", w + "px")
@@ -461,12 +533,12 @@
                 //var btn = document.getElementById("btn");
                 var btn = d3.select(".button");
                 if (btn.text() == "Proactive")
-                    btn.text("Reactive")
+                    btn.text("Reactive");
                 else
-                    btn.text("Proactive")
+                    btn.text("Proactive");
             }
 
-            function drawPreview(svg, json, indexOfPreview) {
+            function drawPreview(index, svg, json) {
                 var graphAttack = [];
                 d3.json(json, function (source) {
                     source.attack.forEach(function (d) {
@@ -482,35 +554,107 @@
                         graphAttack.push({
                             s: nodeS,
                             t: nodeT
-                        })
+                        });
                     });
                     graphAttack.pop();
                     drawArcs(svg, graphAttack);
                     //animationArcs(svg,graphAttack);
                     drawNodes(svg, graphAttack);
 
-                    var g = svg.append("g")
-                            .attr("transform", "translate(" + (wSVGPreview - 75 - 5) + "," + 5 + ")");
+
 
                     var button = d3.select(svg.node().parentNode).select("div").append("button")
                             .style("width", "75px")
                             .style("height", "25px")
                             .style("float", "right")
-                            .html("Start (" + graphAttack.length + ")")
+                            .html("Inspect")
                             .on("click", function () {
                                 svg.selectAll(".linePreviewAttack").remove();
                                 animationArcs(svg, graphAttack);
                                 //d3.event.stopPropagation();
                             });
 
-                    var buttonRP = d3.select(svg.node().parentNode).select("div").append("button")
-                            .style("width", "150px")
-                            .style("height", "25px")
-                            .style("float", "left")
-                            .html("View Response Plan")
-                            .on("click", function () {
-                                drawResponsePlan(indexOfPreview);
+                    //legend
+                    var g = svg.append("g")
+                            .attr("transform", "translate(" + (wSVGPreview - 75) + "," + (hPreviewDiv + 5) + ")");
+
+                    g.append("text")
+                            .attr("class", "textPreview")
+                            .text("Length: " + graphAttack.length);
+
+                    g.append("text")
+                            .attr("transform", "translate(0," + 20 + ")")
+                            .attr("class", "textPreview")
+                            .text("Legend:");
+
+                    var g1 = g.append("g")
+                            .attr("transform", "translate(0," + 40 + ")");
+
+                    g1.append("text")
+                            .attr("class", "textPreview")
+                            .text("Source:");
+
+                    g1.append("rect")
+                            .attr("width", 10)
+                            .attr("height", 10)
+                            .style("fill", "white")
+                            .attr("transform", function (d) {
+                                return "translate(50,-10)";
                             });
+
+                    g1.append("circle")
+                            .attr("r", 2)
+                            .attr("cx", 55)
+                            .attr("cy", -5)
+                            .style("fill", "black");
+
+                    var g2 = g.append("g")
+                            .attr("transform", "translate(0," + 60 + ")");
+
+                    g2.append("text")
+                            .attr("class", "textPreview")
+                            .text("Target:");
+
+                    g2.append("rect")
+                            .attr("width", 10)
+                            .attr("height", 10)
+                            .style("fill", "white")
+                            .attr("transform", function (d) {
+                                return "translate(55,-10)rotate(45)";
+                            });
+
+                    g2.append("circle")
+                            .attr("r", 2)
+                            .attr("cx", 55)
+                            .attr("cy", -2.5)
+                            .style("fill", "black");
+
+                    var button = d3.select(svg.node().parentNode).select("div").append("button")
+                            .style("width", "100px")
+                            .style("height", "25px")
+                            .style("float", "right")
+                            .html("Response Plan")
+                            .on("click", function () {
+
+                            });
+
+                    d3.json("response_plan/RP" + index + ".json", function (data)
+                    {
+                        totalResponse[index - 1] = data;
+                        var rptext = "<b>Response Plan</b> ID" + index + "<br><br>";
+                        //console.log(data);
+                        //console.log(data["response-plan"].length);
+                        for (k = 0; k < data["response-plan"].length; k++)
+                        {
+                            //console.log(k);
+                            nodetext = data["response-plan"][k].mitigation;
+                            rptext = rptext + "<b>Action: </b>" + nodetext.name + " <b>Node: </b>" + nodetext.edge.target + "<br>";
+                        }
+                        //console.log(rptext);
+
+                        //d3.select("#responseText")
+                        //  .html(rptext);
+                    });
 
                     /* g.append("text")
                      .attr("cursor","default")
@@ -527,55 +671,6 @@
                 });
             }
 
-            /**
-             * Draws list of mitigation actions for an attack
-             * @param {Number} indexOfPreview Number of preview to draw
-             */
-            function drawResponsePlan(indexOfPreview) {
-
-                d3.json("response plan/RP" + indexOfPreview + ".json", function (source) {
-
-                    var rows = [];
-
-                    source.responseplan.forEach(function (d) {
-                        var name = d.mitigation.name;
-                        var id = d.mitigation.ID;
-                        rows.push({
-                            name: name,
-                            id: id
-                        });
-                    });
-
-                    if (!d3.select('#responsePlanList').empty()) {
-                        d3.select('#responsePlanList').remove();
-                    }
-
-                    var div = sideMenu.append("div")
-                            .attr("id", "responsePlanList")
-                            .attr("width", width)
-                            .style("height", (h - height - hBottomMenu - sizeLabel - 35) + "px");
-
-                    var table = div.append("table")
-                            .attr("id", "responsePlanTable");
-                    thead = table.append("thead");
-                    tbody = table.append("tbody");
-                    thead.append("th").text("ID");
-                    thead.append("th").text("Name");
-
-                    var tr = tbody.selectAll("tr")
-                            .data(rows)
-                            .enter().append("tr");
-                    tr.selectAll("td")
-                            .data(function (d) {
-                                return [d.id, d.name];
-                            })
-                            .enter().append("td")
-                            .text(function (d) {
-                                return d;
-                            });
-                })
-            }
-
             function drawArcs(svgPreview, list) {
                 svgPreview.selectAll(".path")
                         .data(list)
@@ -588,6 +683,7 @@
 
             function animationArcs(svgPreview, list) {
                 var delay = -1000;
+
                 svgPreview.selectAll(".path")
                         .data(list)
                         .enter()
@@ -598,6 +694,7 @@
                             var s = svgPreview.selectAll("#previewNodes").filter(function (e) {
                                 return e.name == d.s.name;
                             });
+
                             var dx = s.attr("cx"),
                                     dy = s.attr("cy"),
                                     dr = Math.sqrt(dx * dx + dy * dy);
@@ -621,10 +718,12 @@
                             var t = svgPreview.selectAll("#previewNodes").filter(function (e) {
                                 return e.name == d.t.name;
                             });
+
                             var px1SVG = s.attr("cx");
                             var py1SVG = s.attr("cy");
                             var px2SVG = t.attr("cx");
                             var py2SVG = t.attr("cy");
+
                             var dx = px2SVG - px1SVG,
                                     dy = py2SVG - py1SVG,
                                     dr = Math.sqrt(dx * dx + dy * dy);
@@ -642,6 +741,7 @@
                 var long1 = 0;
                 var lat2 = 0;
                 var long2 = 0;
+
                 originalPos.forEach(function (e) {
                     if (e.name == d.s.name) {
                         lat1 = e.x;
@@ -651,22 +751,26 @@
                         lat2 = e.x;
                         long2 = e.y;
                     }
-                })
+                });
 
                 var x1 = lat1 - w / 5;
                 var y1 = long1;
+
                 var x2 = lat2 - w / 5;
                 var y2 = long2;
+
                 //now it need W and H of the map, and W and H of the svg of the preview and map the nodes from the map to the svg
                 //the formula for the mapping are rx= x/wMap ry=y/hMap ----> pxSVG = wSVGPreview*rx pySVG = hSVGPreview*ry
                 var rx1 = x1 / wMap;
                 var ry1 = y1 / hMap;
                 var px1SVG = wSVGPreview * rx1;
                 var py1SVG = hSVGPreview * ry1;
+
                 var rx2 = x2 / wMap;
                 var ry2 = y2 / hMap;
                 var px2SVG = wSVGPreview * rx2;
                 var py2SVG = hSVGPreview * ry2;
+
                 var dx = px2SVG - px1SVG,
                         dy = py2SVG - py1SVG,
                         dr = Math.sqrt(dx * dx + dy * dy);
@@ -684,16 +788,19 @@
                 var sourceTarget = [];
                 var source = [];
                 var target = [];
+
                 list.forEach(function (d) {
                     if (index == 0)
                         nodelist.push(d.s);
                     nodelist.push(d.t);
                     index++;
                 });
+
                 sourceTarget.push(nodelist[0]);
                 sourceTarget.push(nodelist[nodelist.length - 1]);
                 source.push(nodelist[0]);
                 target.push(nodelist[nodelist.length - 1]);
+
                 //drawing of the normal node
                 svgPreview.selectAll(".circle")
                         .data(nodelist)
@@ -708,6 +815,7 @@
                         })
                         .attr("r", 3)
                         .style("fill", "white");
+
                 /*	//source and target
                  svgPreview.selectAll(".circle")
                  .data(sourceTarget)
@@ -734,8 +842,9 @@
                         .attr("height", 10)
                         .style("fill", "white")
                         .attr("transform", function (d) {
-                            return "translate(" + (calculateX(d) - 10 / 2) + "," + (calculateY(d) - 10 / 2) + ")"
+                            return "translate(" + (calculateX(d) - 10 / 2) + "," + (calculateY(d) - 10 / 2) + ")";
                         });
+
                 //target
                 var r = svgPreview.selectAll(".rect")
                         .data(target)
@@ -746,8 +855,11 @@
                         .attr("height", 10)
                         .style("fill", "white")
                         .attr("transform", function (d) {
-                            return "translate(" + (calculateX(d) - 10 * Math.sqrt(2) / 2) + "," + calculateY(d) + ")rotate(-45)"
+                            return "translate(" + (calculateX(d) - 10 * Math.sqrt(2) / 2) + "," + calculateY(d) + ")rotate(-45)";
                         });
+
+
+
                 svgPreview.selectAll(".circle")
                         .data(sourceTarget)
                         .enter()
@@ -764,38 +876,49 @@
 
             function calculateX(d) {
                 var lat = d.x;
+
                 var googleCoord = 0;
+
                 originalPos.forEach(function (e) {
                     if (e.name == d.name)
                         googleCoord = e.x;
-                })
+                });
                 var x = googleCoord - w / 5;
+
                 var rx = x / wMap;
                 var pxSVG = wSVGPreview * rx;
+
                 return pxSVG;
             }
 
             function calculateY(d) {
                 var l = d.y;
+
                 var googleCoord = 0;
+
                 originalPos.forEach(function (e) {
                     if (e.name == d.name)
                         googleCoord = e.y;
-                })
+                });
 
                 var y = googleCoord;
+
                 var ry = y / hMap;
                 var pySVG = hSVGPreview * ry;
+
                 return pySVG;
             }
 
             function createChart(json, x) {
                 var index = 0, i = 0;
                 var graphAttack = [], lines = [], tableAttack = d3.select(".tableAttack");
+
+
                 //draw graph attacck and donut chart
 
 
                 flagTable = 1;
+
                 //draw donut and graph attack
                 d3.json(json, function (source) {
                     var yOffset = 0;
@@ -811,6 +934,7 @@
 
                     source.attack.forEach(function (d) {
                         var s_attack = source.attack[i++];
+
                         var g1 = svgTable.append("g")
                                 .attr("transform", "translate(" + radius / 8 + "," + yOffset + ")")
                                 .attr("id", "idGTable" + getSubnet(s_attack.source.name).replace(/\./g, "_")) //id will be #idGTable192_168_1
@@ -830,8 +954,9 @@
                                                         .attr("r", 9)
                                                         .attr("stroke", "#ff0")
                                                         .style("fill", "#3d3d3d")
-                                                        .attr("stroke-width", "2px")
+                                                        .attr("stroke-width", "2px");
                                             });
+
                                     //animation for normal nodes
                                     d3.select(".bottomMenu").selectAll("#previewNodes").filter(function (d) {
                                         return d.name == s_attack.source.name;
@@ -846,6 +971,7 @@
                                                         .duration(1000)
                                                         .attr("r", 3);
                                             });
+
                                     //animation for source and target nodes
                                     d3.select(".bottomMenu").selectAll("#previewNodesST").filter(function (d) {
                                         return d.name == s_attack.source.name;
@@ -871,6 +997,7 @@
                                             .attr("r", 7)
                                             .style("fill", "#3d3d3d")
                                             .attr("stroke-width", "0px");
+
                                     //set back normal nodes
                                     d3.select(".bottomMenu").selectAll("#previewNodes").filter(function (d) {
                                         return d.name == s_attack.source.name;
@@ -879,6 +1006,7 @@
                                             .duration(1000)
                                             .attr("r", 3)
                                             .style("fill", "white");
+
                                     //set back source and target nodes
                                     d3.select(".bottomMenu").selectAll("#previewNodesST").filter(function (d) {
                                         return d.name == s_attack.source.name;
@@ -887,6 +1015,8 @@
                                             .duration(1000)
                                             .attr("r", 5)
                                             .style("fill", "white");
+
+
                                 })
                                 .on("click", function () {
                                     var previousArcs = true;
@@ -907,6 +1037,7 @@
                                     });
                                     //instantiate
                                     var remainInstantiateAttackArcs = d3.selectAll(".lineInstantiateAttack");
+
                                     var outgoingInstantiateAttackArcs = d3.selectAll("#lineInstantiateAttack" + id).filter(function (d) { //outgoing arcs
                                         if (d.source.name == s_attack.source.name) {
                                             previousArcs = false;
@@ -914,11 +1045,13 @@
                                         }
                                         return (d.source.name != s_attack.source.name) && previousArcs;
                                     });
+
                                     //iinks
                                     var remainLinks = d3.selectAll(".line");
                                     var outgoingLinks = d3.selectAll(".line").filter(function (d) { //outgoing arcs
                                         return (d.source.name == s_attack.source.name) || (d.target.name == s_attack.source.name);
                                     });
+
                                     if (lastClickedNode != s_attack.source.name || flagClickedNode == 0) {
                                         remainAttackArcs.transition().duration(1000).style("opacity", 0);
                                         remainInstantiateAttackArcs.transition().duration(1000).style("opacity", 0);
@@ -949,12 +1082,14 @@
                                     }
                                     lastClickedNode = s_attack.source.name;
                                 });
+
                         g1.append("rect")
                                 .attr("width", radius / 2 + "px")
                                 .attr("height", radius * 0.1 + "px")
                                 .attr("fill", function () {
                                     return color(getSubnet(s_attack.source.name));
                                 });
+
                         g1.append("text")
                                 .attr("dy", radius * 0.1 / 1.5)
                                 .style("text-anchor", "middle")
@@ -965,20 +1100,31 @@
                         yOffset += parseInt(radius * 0.1) + 1;
                         graphAttack.push(s_attack.source.name);
                     });
+
+
+
+
                 });
+
+
             }
 
             function createGraph(json, x, type) {
                 //reset all lines
-                d3.selectAll(".line").style("opacity", 0.2);
+                d3.selectAll(".line").style("opacity", 0.1);
+                //reset all node
+                d3.selectAll(".node").selectAll("circle").style("fill", "#3d3d3d");
+
                 var index = 0,
                         graphAttack = [],
                         lines = [];
                 d3.json(json, function (source) {
                     var i = 0;
+
                     source.attack.forEach(function (d) {
                         graphAttack.push(d.source.name);
                     });
+
                     while (index < graphAttack.length) {
                         var x1 = graphAttack[index++];
                         if (index + 1 > graphAttack.length)
@@ -992,13 +1138,21 @@
                                 s = d;
                             if (d.name == x2)
                                 t = d;
-                        })
+                        });
                         lines.push({
                             source: s,
                             target: t
-                        })
+                        });
                     }
 
+                    //d3.selectAll(".node").filter(function (e)){
+                    //graphAtta
+                    //	}
+                    //cioppo=lines;
+
+
+                    var ap = getAttackArray(lines);  //contains the attack path in the form of an array of nodes
+                    //console.log(cioppo);
                     var path = layer.append("svg:g")
                             .selectAll("path")
                             .data(lines)
@@ -1009,13 +1163,17 @@
                                 var d2 = new google.maps.LatLng(d.target.x, d.target.y);
                                 d1 = projection.fromLatLngToDivPixel(d1);
                                 d2 = projection.fromLatLngToDivPixel(d2);
+
                                 var x1 = d1.x + svgshifting;
                                 var y1 = d1.y + svgshifting;
+
                                 var x2 = d2.x + svgshifting;
                                 var y2 = d2.y + svgshifting;
+
                                 var dx = x2 - x1,
                                         dy = y2 - y1,
                                         dr = Math.sqrt(dx * dx + dy * dy);
+
                                 return "M" +
                                         x1 + "," +
                                         y1 + "A" +
@@ -1023,11 +1181,19 @@
                                         x2 + "," +
                                         y2;
                             })
-                            .attr("class", function () {
+                            .attr("class", function (d, i) {
                                 if (type == 0) //static attack graph
                                     return "lineStaticAttack";
                                 else
-                                    return "lineInstantiateAttack";
+                                {
+                                    //cioppo=lines;
+                                    //console.log(lines)
+                                    //console.log(i+"----"+globalAttackEvolution)
+                                    if ((i < globalAttackEvolution) && alertNodes[i + 1] === ap[i + 1])
+                                        return "lineInstantiateAttack";
+                                    else
+                                        return "lineInstantiateOnGoingAttack";
+                                }
                             })
                             .attr("id", function () {
                                 if (type == 0) //static attack graph
@@ -1053,10 +1219,29 @@
                                     function () {
                                         if (type == 0) //static attack graph
                                             return "url(#end)";
-                                        else
+                                        else {
                                             return "url(#instantiate)";
+                                        }
                                     });
                 });
+            }
+
+            function getAttackArray(arlines)
+            {
+                var result = [];
+                for (i = 0; i < arlines.length; i++)
+                {
+                    if (i == 0)
+                    {
+                        result.push(arlines[i].source.name);
+                        result.push(arlines[i].target.name);
+                    }
+                    else
+                    {
+                        result.push(arlines[i].target.name);
+                    }
+                }
+                return result;
             }
 
             function getSubnet(s) {
@@ -1102,15 +1287,19 @@
                 var radius = Math.min(width, height) / 1.5,
                         graphAttack = [],
                         lines = [];
+
                 var arc = d3.svg.arc()
                         .outerRadius(radius - wSideMenu * 0.23)
                         .innerRadius(radius - wSideMenu * 0.28);
+
                 var arcOver = d3.svg.arc()
                         .outerRadius(radius - wSideMenu * 0.2)
                         .innerRadius(radius - wSideMenu * 0.31);
+
                 var arcAttack = d3.svg.arc()
                         .outerRadius((radius - wSideMenu * 0.275) - 2)
                         .innerRadius(radius - wSideMenu * 0.32);
+
                 /*var arcAttack = d3.svg.arc()
                  .outerRadius(radius - wSideMenu * 0.175)
                  .innerRadius(radius - wSideMenu * 0.275);*/
@@ -1120,6 +1309,7 @@
                         .value(function (d) {
                             return d.size;
                         });
+
                 var tableAttack = sideMenu.append("div")
                         .attr("class", "tableAttack")
                         .style("left", (wSideMenu / 3 - (radius / 8)) + "px")
@@ -1127,19 +1317,39 @@
                         .style("width", 5 * radius / 8 + "px") //radius/2 for rect lenght + radius/8 for shifting when mouseover on arc
                         .style("height", height * 0.6 + "px")
                         .style("max-height", height * 0.6 + "px");
+
                 var svg = sideMenu.append("svg")
                         .attr("id", "donutChart")
                         .attr("width", width)
                         .attr("height", height)
                         .append("g")
                         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
                 sideMenu.append("button")
                         .style("width", 75 + "px")
                         .style("height", 25 + "px")
                         .text("Reset")
                         .on("click", function () {
-                            location.reload();
+                            //location.reload();
+                            removeAllElements();
+                            drawPreviews();
                         });
+
+                //Append Response Plan DIV
+
+                sideMenu.append("div")
+                        .attr("id", "responseText")
+                        .style("width", wSideMenu + "px")
+                        .style("height", "200px");
+
+                //d3.select("#responseText")
+                //.html("<b>Response Plan</b>");
+
+
+
+                var responseTable = sideMenu.append("div")
+                        .attr("class", "tableResponse");
+
                 var g = svg.selectAll(".arc")
                         .data(pie(subnetList))
                         .enter().append("g")
@@ -1156,6 +1366,7 @@
                                     .attr("r", 9)
                                     .attr("stroke", "#ff0")
                                     .attr("stroke-width", "2px");
+
                             var edge = d3.selectAll(".line").filter(function (e) {
                                 return (e.source.subnet == d.data.subnet) || (e.target.subnet == d.data.subnet);
                             })
@@ -1163,8 +1374,9 @@
                                     .duration(500)
                                     .style("opacity", 1)
                                     .style("stroke", function () {
-                                        return color(d.data.subnet)
+                                        return color(d.data.subnet);
                                     });
+
                             /* 
                              if(d3.select(".tableAttack").selectAll("svg")[0].length>0){
                              svg.style("display","none");
@@ -1180,6 +1392,7 @@
                                     .style("fill", "#3d3d3d")
                                     .attr("r", 7)
                                     .attr("stroke-width", "0px");
+
                             var edge = d3.selectAll(".line").filter(function (e) {
                                 return (e.source.subnet == d.data.subnet) || (e.target.subnet == d.data.subnet);
                             })
@@ -1188,10 +1401,11 @@
                                     .style("opacity", 0.2)
                                     .style("stroke", "#000");
                         });
+
                 g.append("path")
                         .attr("d", arc)
                         .style("fill", function (d) {
-                            return color(d.data.subnet)
+                            return color(d.data.subnet);
                         })
                         .on("mouseover", function (d) {
                             var thisArc = d3.select(this);
@@ -1199,7 +1413,7 @@
                             var attackNode = d3.select(".tableAttack").selectAll("svg").filter(function (e) {
                                 return d3.select(this).attr("display") != "none";
                             });
-                            attackNode = attackNode.selectAll("#idGTable" + d.data.subnet.replace(/\./g, "_"))
+                            attackNode = attackNode.selectAll("#idGTable" + d.data.subnet.replace(/\./g, "_"));
                             // var ratio=1;
                             // if(attackNode[0]>0)
                             //ratio=attackNode[0].length/d.value;
@@ -1207,10 +1421,12 @@
                             if (attackNode.length != 0) {
                                 if (attackNode[0].length != 0) {
                                     var ratio = 1 - (attackNode[0].length / d.value);
+
                                     var initArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wSideMenu * 0.2) + 2)
                                             .innerRadius((radius - wSideMenu * 0.2) + 2);
                                     var endArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wSideMenu * 0.2) + 2)
                                             .innerRadius(radius - wSideMenu * 0.175);
+
                                     var data = [];
                                     data.push({
                                         init: initArc,
@@ -1218,7 +1434,7 @@
                                         startAngle: a.__data__.startAngle,
                                         endAngle: a.__data__.endAngle,
                                         r: ratio
-                                    })
+                                    });
 
                                     d3.select(d3.select(this).node().parentNode).selectAll(".path")
                                             .data(data)
@@ -1254,13 +1470,15 @@
                             var attackNode = d3.select(".tableAttack").selectAll("svg").filter(function (e) {
                                 return d3.select(this).attr("display") != "none";
                             });
-                            attackNode = attackNode.selectAll("#idGTable" + d.data.subnet.replace(/\./g, "_"))
+                            attackNode = attackNode.selectAll("#idGTable" + d.data.subnet.replace(/\./g, "_"));
                             //var attackNode=d3.select(".tableAttack").select("svg").selectAll("#idGTable"+d.data.subnet.replace(/\./g, "_"));
                             //var ratio=1;
                             if (a != null) {
                                 var ratio = 1 - (attackNode[0].length / d.value);
+
                                 var initArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wSideMenu * 0.2) + 2)
                                         .innerRadius((radius - wSideMenu * 0.2) + 2);
+
                                 tempArc.transition().duration(500).attr("d", initArc).each("end", function () {
 
                                     d3.select(d3.select(this).node().parentNode).selectAll("#tempArc").remove();
@@ -1274,6 +1492,7 @@
                             restoreSiftedRect(d.data.subnet);
                             //restore old lines
                         });
+
                 g.append("text")
                         .attr("transform", function (d) {
                             return "translate(" + arc.centroid(d) + ")";
@@ -1284,6 +1503,7 @@
                         .html(function (d) {
                             return d.data.subnet;
                         });
+
                 g.append("text")
                         .style("pointer-events", "none")
                         .attr("transform", function (d) {
@@ -1298,41 +1518,75 @@
 
             function removeGraphAndChart(index) {
                 //reset all lines
-                d3.selectAll(".line").style("opacity", 0.2)
+                d3.selectAll(".line").style("opacity", 0.2);
                 layer.selectAll("#lineStaticAttack" + index).remove();
                 d3.select("#svgTable_" + index).remove();
             }
 
-            function reactive() {
+            function bestMatch(array, index)
+            {
+                //console.log("blerah "+index);
+                var ordered = likelihoodRank.sort(function (a, b) {
+                    return a.id - b.id;
+                });
+                var best = maxim(ordered, index);
+                return best;
+            }
+
+            function maxim(array, index)
+            {
+                var max = 0;
+                var id;
+                for (i = 0; i < index; i++)
+                {
+                    //console.log("è nel max "+array[i].p+"   "+max);
+                    if (+array[i].p > max)
+                    {
+                        max = array[i].p;
+                        id = array[i].id;
+                        //console.log("è nel max");
+                    }
+                }
+                return id;
+            }
+
+            function reactive(indexOfAlert) {
                 if (mode == 0 && likelihoodRank.length > 0) {
                     d3.selectAll(".lineStaticAttack").remove();
+                    d3.selectAll(".lineInstantiateOnGoingAttack").remove();
                     d3.select(".tableAttack").selectAll("svg").remove();
                     d3.selectAll(".line").style("opacity", 0.2);
                     d3.select(".bottomMenu").selectAll(".attackPreview").style("border-color", "white");
+
                     queueSVG = [];
                     var index = likelihoodRank[0].id;
                     var j = "json attack/attack" + index + ".json";
                     createChart(j, index);
                     createGraph(j, index, 1); // 1 means is an istantiate graph
-                    d3.select("#attackPreview_" + index).style("border-color", "#f00")
+                    d3.select("#attackPreview_" + index).style("border-color", "#f00");
                 }
                 else {
                     if (likelihoodRank.length > 0) {
-                        if (likelihoodRank[0].id != idInstantiated) {
-                            idInstantiated = likelihoodRank[0].id;
-                            d3.selectAll(".lineStaticAttack").remove();
-                            d3.selectAll(".lineInstantiateAttack").remove();
-                            d3.select(".tableAttack").selectAll("svg").remove();
-                            d3.selectAll(".line").style("opacity", 0.2);
-                            d3.select(".bottomMenu").selectAll(".attackPreview").style("border-color", "white");
-                            //d3.select(".bottomMenu").style("pointer-events","none");
-                            //d3.select(".bottomMenuLabel").style("display","none");
-                            queueSVG = [];
-                            var j = "json attack/attack" + idInstantiated + ".json";
-                            createChart(j, idInstantiated);
-                            createGraph(j, idInstantiated, 1); // 1 means is an istantiate graph
-                            d3.select("#attackPreview_" + idInstantiated).style("border-color", "#f00")
-                        }
+                        //if(likelihoodRank[0].id!=idInstantiated){
+                        //idInstantiated=likelihoodRank[0].id;
+                        //console.log(likelihoodRank+" ++++++++ "+indexOfAlert);
+                        idInstantiated = bestMatch(likelihoodRank, indexOfAlert);
+                        //console.log("PARAPPPAAAAAAA---- "+idInstantiated);
+                        d3.selectAll(".lineStaticAttack").remove();
+                        d3.selectAll(".lineInstantiateAttack").remove();
+                        d3.selectAll(".lineInstantiateOnGoingAttack").remove();
+                        d3.select(".tableAttack").selectAll("svg").remove();
+                        d3.selectAll(".line").style("opacity", 0.2);
+                        d3.select(".bottomMenu").selectAll(".attackPreview").style("border-color", "white");
+                        //d3.select(".bottomMenu").style("pointer-events","none");
+                        //d3.select(".bottomMenuLabel").style("display","none");
+                        queueSVG = [];
+
+                        var j = "json attack/attack" + idInstantiated + ".json";
+                        createChart(j, idInstantiated);
+                        createGraph(j, idInstantiated, 1); // 1 means is an istantiate graph
+                        d3.select("#attackPreview_" + idInstantiated).style("border-color", "#f00");
+                        //}
                     }
                 }
                 mode = 1;
@@ -1341,6 +1595,7 @@
             function proactive() {
                 //d3.select(".bottomMenu").style("pointer-events","initial");
                 d3.selectAll(".line").style("opacity", 0.2);
+                d3.selectAll(".node").selectAll("circle").style("fill", "#3d3d3d");
                 d3.selectAll(".lineInstantiateAttack").remove();
                 d3.selectAll(".attackPreview").style("border-color", "#fff");
                 d3.select(".tableAttack").selectAll("svg").remove();
@@ -1350,8 +1605,19 @@
             function drawFunc(indexOfPreview) {
 
                 $("<div style=\"width:" + wAttackPreview + "px; height:" + hBottomMenu + "px;\" id=\"attackPreview_" + indexOfPreview + "\" class=\"attackPreview\"><div style=\"position: absolute; width:" + wAttackPreview + "px; height:" + hPreviewDiv + "px;\"></div><svg style=\"width:" + wAttackPreview + "px; height:" + hSVGPreview + "px;\" class=\"SVGPreview\"></svg></div>").prependTo(".bottomMenu");
-                var svgPreview = d3.select("#attackPreview_" + indexOfPreview).select("svg");
+
+                var divPreview = d3.select("#attackPreview_" + indexOfPreview);
+                globalAttackEvolution = indexOfPreview - 1;
+                //IDff
+                divPreview.select("div").append("text")
+                        .attr("class", "textAttackID")
+                        .text("Attack ID: " + indexOfPreview)
+                        .style("left", "5px")
+                        .style("top", "5px");
+
+                var svgPreview = divPreview.select("svg");
                 var json = "json attack/attack" + indexOfPreview + ".json";
+
                 //update likelihood array
                 d3.json(json, function (source) {
                     var o = {id: indexOfPreview, p: source.probability};
@@ -1378,9 +1644,44 @@
                     }
 
                     //if we are in reactive mode
-                    if (mode == 1)
-                        reactive();
-                })
+                    if (mode == 1) {
+                        reactive(indexOfPreview);
+                        var a = alertNodes.slice(0, indexOfPreview);
+                        var node = d3.selectAll(".node").filter(function (e) {
+                            return a.indexOf(e.name) != -1;
+                        });
+                        node.selectAll("circle").style("fill", "red");
+
+                        node.filter(function (d) {
+                            return d.name == alertNodes[indexOfPreview - 1];
+                        }).select("circle")
+                                .transition()
+                                .duration(500)
+                                .attr("r", 10)
+                                .style("fill", "red")
+                                .each("end", function () {
+                                    d3.select(this)
+                                            .transition()
+                                            .duration(500)
+                                            .attr("r", 7);
+                                });
+                    }
+                    //blink animation
+                    if (mode == 0) {
+                        divPreview.transition().duration(500).style("border-color", "#fff");
+                    }
+                    else {
+                        //console.log(idInstantiated +" ////// "+indexOfPreview)
+                        if (idInstantiated === indexOfPreview) {
+                            divPreview.transition().duration(500).style("border-color", "#f00");
+                        }
+                        else {
+                            divPreview.transition().duration(500).style("border-color", "#fff");
+                        }
+                    }
+
+                });
+
 
 
 
@@ -1388,6 +1689,7 @@
 
                     //delete temporary accumulate arcs
                     d3.selectAll("#tempArc").remove();
+
                     //if we are in proactive mode we add the graphs on the map
                     if (mode == 0) {
                         var div = d3.select(d3.select(this).node().parentNode);
@@ -1425,10 +1727,600 @@
 
                     }
                 });
-                //delete preview elements
-                drawPreview(svgPreview, json, indexOfPreview);
+
+                drawPreview(indexOfPreview, svgPreview, json);
+
             }
 
+            function getNode(node)
+            {
+                for (k = 0; k < totalNode.length; k++)
+                {
+                    if (totalNode[k].name === node)
+                        return totalNode[k];
+                }
+            }
+
+            function computeBarrier(index, s, t)
+            {
+                var result = [];
+                var activeResponse = totalResponse[index]["response-plan"];
+                for (k = 0; k < activeResponse.length; k++)
+                {
+                    //console.log(k);
+                    if ((activeResponse[k].mitigation.edge.source === s) && (activeResponse[k].mitigation.edge.target === t))
+                        result.push(activeResponse[k]);
+                }
+                //console.log(result);
+                return result;
+            }
+
+            function perimeter(activeNode)
+            {
+                var activeEdges = [];
+                for (k = 0; k < totalEdges.length; k++)
+                {
+                    if (totalEdges[k].source.name === activeNode)
+                        activeEdges.push(totalEdges[k]);
+                }
+                //console.log(activeEdges);
+
+                //sono con strutture diverse
+                var activeAttackEdges = [];
+                for (h = 0; h < totalAttacks.length; h++)
+                {
+                    for (k = 0; k < totalAttacks[h].attack.length; k++)
+                    {
+                        if (totalAttacks[h].attack[k].source.name === activeNode)
+                        {
+                            var barrier = [];
+                            var s = totalAttacks[h].attack[k].source.name;
+                            var t = totalAttacks[h].attack[k].target.name;
+                            barrier = computeBarrier(h, s, t);
+                            var o = {source: getNode(s),
+                                target: getNode(t),
+                                barrier: barrier};
+                            activeAttackEdges.push(o);
+                        }
+                    }
+
+                }
+                //console.log(activeAttackEdges);
+
+                //console.log("-------- "+ activeNode);
+                var previousArcs = true;
+
+                /*              var s;
+                 var t;
+                 totalNode.forEach(function(d) {
+                 
+                 if (d.name == x1)
+                 s = d;
+                 if (d.name == x2)
+                 t = d;
+                 })
+                 lines.push({
+                 source: s,
+                 target: t
+                 })*/
+
+                var path = layer.append("svg:g")
+                        .selectAll("path")
+                        .data(activeAttackEdges)
+                        .enter().append("svg:path")
+                        .attr("d", function (d) {
+
+                            var d1 = new google.maps.LatLng(d.source.x, d.source.y);
+                            var d2 = new google.maps.LatLng(d.target.x, d.target.y);
+                            d1 = projection.fromLatLngToDivPixel(d1);
+                            d2 = projection.fromLatLngToDivPixel(d2);
+
+                            var x1 = d1.x + svgshifting;
+                            var y1 = d1.y + svgshifting;
+
+                            var x2 = d2.x + svgshifting;
+                            var y2 = d2.y + svgshifting;
+
+                            var dx = x2 - x1,
+                                    dy = y2 - y1,
+                                    dr = Math.sqrt(dx * dx + dy * dy);
+
+                            return "M" +
+                                    x1 + "," +
+                                    y1 + "A" +
+                                    dr + "," + dr + " 0 0,1 " +
+                                    x2 + "," +
+                                    y2;
+                        })
+                        .attr("class", function (d, i) {
+                            return "lineStaticAttack";
+                        })
+                        .style("stroke-width", "5px");
+
+
+                var datiLunghezze = [];
+                layer.selectAll(".lineStaticAttack")
+                        .each(function (d, i) {
+                            var l = this.getTotalLength();
+                            var p = this.getPointAtLength(0.9 * l);
+                            datiLunghezze[i] = p;
+                        });
+
+                d3.selectAll(".barrier").transition().attr("fill-opacity", 0.1);
+                d3.selectAll(".barrierGreen").transition().attr("fill-opacity", 0.1);
+                d3.selectAll(".barrierRed").transition().attr("fill-opacity", 0.1);
+
+                for (k = 0; k < datiLunghezze.length; k++)
+                {
+                    //console.log(k);
+                    var actual = 0;
+                    createBarrier(activeAttackEdges[k], k, datiLunghezze, actual);
+                    actual = actual + 1;
+                    /*layer.append("circle")
+                     .attr("class","barrier")
+                     .attr("cx",function(){
+                     var p=datiLunghezze[k];
+                     //console.log(p);
+                     return p.x;
+                     })
+                     .attr("cy",function(){
+                     var p=datiLunghezze[k];
+                     return p.y;
+                     })
+                     .attr("r",10)
+                     .style("fill","yellow");*/
+                }
+
+                //.node().getPointAtLength(1.0 * l)
+
+
+
+
+
+                //black links
+                var outgoingLinks = layer.selectAll(".line").filter(function (d) { //outgoing arcs
+                    return (d.source.name === activeNode);
+                })
+                        .style("stroke-width", "5px")
+                        .style("opacity", "1.0");
+                //console.log(outgoingLinks);
+
+                d3.select(window)
+                        .on("keydown", function () {
+                            console.log(activeAttackEdges[0]);
+                            var mitigations = activeAttackEdges[0].barrier;
+                            var countMitigations = mitigations.length;
+                            var success = 0;
+                            for (m = 0; m < countMitigations; m++)
+                            {
+                                if (mitigations[m].mitigation.status === "success")
+                                    success = success + 1;
+                            }
+                            var failed = countMitigations - success;
+                            var step = 10;
+                            var count = 1;
+
+                            d3.select("#responseText")
+                                    .html("<b>Barrier of Mitigation Actions</b>");
+
+                            var barlayer = d3.select("#responseText")
+                                    .append("svg")
+                                    .attr("width", "200px")
+                                    .attr("height", "200px")
+                                    .style("fill", "white");
+
+                            for (j = 0; j < mitigations.length; j++)
+                            {
+                                if ((mitigations[j].mitigation.status == "inactive") || (mitigations[j].mitigation.status == "failed"))
+                                {
+                                    console.log("eccomi");
+                                    barlayer.append("svg:rect")
+                                            .datum(mitigations[j].mitigation)
+                                            .attr("x", "10px")
+                                            .attr("y", function () {
+                                                return count * 20;
+                                            })
+                                            .attr("width", "50px")
+                                            .attr("height", "20px")
+                                            .style("fill", "red")
+                                            .style("stroke", "black")
+                                            .style("stroke-width", "2px")
+                                            .on("click", function (d) {
+                                                showDetails(d);
+                                            });
+
+                                    count = count + 1;
+                                }
+                            }
+
+                            for (j = 0; j < mitigations.length; j++)
+                            {
+                                if (mitigations[j].mitigation.status == "success")
+                                {
+                                    console.log("eccomi");
+                                    barlayer.append("svg:rect")
+                                            .datum(mitigations[j].mitigation)
+                                            .attr("x", "10px")
+                                            .attr("y", function () {
+                                                return count * 20;
+                                            })
+                                            .attr("width", "50px")
+                                            .attr("height", "20px")
+                                            .style("fill", "green")
+                                            .style("stroke", "black")
+                                            .style("stroke-width", "2px")
+                                            .on("click", function (d) {
+                                                showDetails(d);
+                                            });
+
+                                    count = count + 1;
+                                }
+                            }
+
+
+
+
+
+                        });
+            }
+
+            function creaBar(mitigations)
+            {
+                var countMitigations = mitigations.length;
+                var success = 0;
+                for (m = 0; m < countMitigations; m++)
+                {
+                    if (mitigations[m].mitigation.status === "success")
+                        success = success + 1;
+                }
+                var failed = countMitigations - success;
+                var step = 10;
+                var count = 1;
+
+                d3.select("#responseText")
+                        .html("<b>Barrier of Mitigation Actions</b>");
+
+                var barlayer = d3.select("#responseText")
+                        .append("svg")
+                        .attr("id", "barrierDetailsArea")
+                        .attr("width", "400px")
+                        .attr("height", "200px")
+                        .style("fill", "white");
+
+                for (j = 0; j < mitigations.length; j++)
+                {
+                    if ((mitigations[j].mitigation.status == "inactive") || (mitigations[j].mitigation.status == "failed"))
+                    {
+                        console.log("eccomi");
+                        barlayer.append("svg:rect")
+                                .datum(mitigations[j].mitigation)
+                                .attr("x", "5px")
+                                .attr("y", function () {
+                                    return count * 20;
+                                })
+                                .attr("width", "50px")
+                                .attr("height", "20px")
+                                .style("fill", "red")
+                                .style("stroke", "black")
+                                .style("stroke-width", "2px")
+                                .on("click", function (d) {
+                                    var c = parseInt(d3.select(this).attr("y"));
+                                    showDetails(d, c);
+                                });
+                        d3.select("#barrierDetailsArea")
+                                .append("text")
+                                .attr("x", "70px")
+                                .attr("y", function () {
+                                    return count * 20 + 10;
+                                })
+                                .style("font-size", "10px")
+                                .text("ID: " + mitigations[j].mitigation.ID + " type: " + mitigations[j].mitigation.name + " node: " + mitigations[j].mitigation.edge.target);
+
+                        count = count + 1;
+                    }
+                }
+
+                for (j = 0; j < mitigations.length; j++)
+                {
+                    if (mitigations[j].mitigation.status == "success")
+                    {
+                        console.log("eccomi");
+                        barlayer.append("svg:rect")
+                                .datum(mitigations[j].mitigation)
+                                .attr("x", "5px")
+                                .attr("y", function () {
+                                    return count * 20;
+                                })
+                                .attr("width", "50px")
+                                .attr("height", "20px")
+                                .style("fill", "green")
+                                .style("stroke", "black")
+                                .style("stroke-width", "2px")
+                                .on("click", function (d) {
+                                    var c = parseInt(d3.select(this).attr("y"));
+                                    showDetails(d, c);
+                                });
+
+                        d3.select("#barrierDetailsArea")
+                                .append("text")
+                                .attr("x", "70px")
+                                .attr("y", function () {
+                                    return count * 20 + 10;
+                                })
+                                .style("font-size", "10px")
+                                .text("ID: " + mitigations[j].mitigation.ID + " type: " + mitigations[j].mitigation.name + " node: " + mitigations[j].mitigation.edge.target);
+
+                        count = count + 1;
+                    }
+                }
+
+
+
+
+
+
+            }
+
+
+            function showDetails(data, h)
+            {
+                console.log(h);
+                d3.select("#barrierDetailsArea")
+                        .append("text")
+                        .attr("x", "70px")
+                        .attr("y", function () {
+                            return h + 10;
+                        })
+                        .style("font-size", "10px")
+                        .text("ID: " + data.ID + " type: " + data.name + " node: " + data.edge.target);
+            }
+
+            function showData() {
+                console.log("ciao");
+                var m = 10;
+                console.log(m);
+            }
+
+            function createBarrier(edges, iter, datiL, ac)
+            {
+                console.log(edges);
+                var mitigations = edges.barrier;
+                var countMitigations = mitigations.length;
+                var success = 0;
+                for (m = 0; m < countMitigations; m++)
+                {
+                    if (mitigations[m].mitigation.status === "success")
+                        success = success + 1;
+                }
+                var failed = countMitigations - success;
+                var step = 10;
+
+                layer.append("svg:rect")
+                        .transition()
+                        .attr("class", "barrier")
+                        //.attr("id","br"+ac)
+                        .attr("x", datiL[iter].x)
+                        .attr("y", datiL[iter].y)
+                        .attr("width", "10px")
+                        .attr("height", function () {
+                            return countMitigations * 10;
+                        })
+                        .style("fill", "white")
+                        .style("stroke", "black")
+                        .style("stroke-width", "1px");
+
+                layer.append("svg:rect")
+                        .datum(mitigations)
+                        .on("click", function (d) {
+                            console.log("cippippolo");
+                            creaBar(d);
+                        })
+                        .transition()
+                        .attr("class", "barrierGreen")
+                        .attr("x", datiL[iter].x)
+                        .attr("y", function () {
+                            var res = datiL[iter].y + failed * step;
+                            return res;
+                        })
+                        .attr("width", "10px")
+                        .attr("height", function (d) {
+                            var res = step * success;
+                            return res;
+                        })
+                        .style("fill", "green");
+
+
+
+                layer.append("svg:rect")
+                        .datum(mitigations)
+                        .on("click", function (d) {
+                            console.log("cippippolo");
+                            creaBar(d);
+                        })
+                        .transition()
+                        .attr("class", "barrierRed")
+                        .attr("x", datiL[iter].x)
+                        .attr("y", datiL[iter].y)
+                        .attr("width", "10px")
+                        .attr("height", function () {
+                            var res = step * failed;
+                            return res;
+                        })
+                        .style("fill", "red");
+
+                //.transition()
+                //.attr("width","50px");
+
+
+            }
+
+
+
+            function reactiveAlert(indexOfPreview) {
+                var json = "json attack/attack" + indexOfPreview + ".json";
+
+                //update likelihood array
+                d3.json(json, function (source) {
+                    if (mode == 1) {
+                        reactive(indexOfPreview);
+                        var a = alertNodes.slice(0, indexOfPreview);
+                        var node = d3.selectAll(".node").filter(function (e) {
+                            return a.indexOf(e.name) != -1;
+                        });
+                        node.selectAll("circle").style("fill", "red");
+
+
+                        var active = alertNodes[indexOfPreview - 1];
+                        perimeter(active);
+
+                        node.filter(function (d) {
+                            return d.name == alertNodes[indexOfPreview - 1];
+                        }).select("circle")
+                                .transition()
+                                .duration(500)
+                                .attr("r", 10)
+                                .style("fill", "red")
+                                .each("end", function () {
+                                    d3.select(this)
+                                            .transition()
+                                            .duration(500)
+                                            .attr("r", 7);
+                                });
+                    }
+                });
+            }
+
+            function drawFuncReactive(indexOfPreview) {
+
+                $("<div style=\"width:" + wAttackPreview + "px; height:" + hBottomMenu + "px;\" id=\"attackPreview_" + indexOfPreview + "\" class=\"attackPreview\"><div style=\"position: absolute; width:" + wAttackPreview + "px; height:" + hPreviewDiv + "px;\"></div><svg style=\"width:" + wAttackPreview + "px; height:" + hSVGPreview + "px;\" class=\"SVGPreview\"></svg></div>").prependTo(".bottomMenu");
+
+                var divPreview = d3.select("#attackPreview_" + indexOfPreview);
+                globalAttackEvolution = indexOfPreview - 1;
+                //IDff
+                divPreview.select("div").append("text")
+                        .attr("class", "textAttackID")
+                        .text("Attack ID: " + indexOfPreview)
+                        .style("left", "5px")
+                        .style("top", "5px");
+
+                var svgPreview = divPreview.select("svg");
+                var json = "json attack/attack" + indexOfPreview + ".json";
+
+                //update likelihood array
+                d3.json(json, function (source) {
+                    totalAttacks[indexOfPreview - 1] = source;
+                    var o = {id: indexOfPreview, p: source.probability};
+                    if (likelihoodRank.length == 0) {
+                        likelihoodRank.push(o);
+                    }
+                    else {
+                        var i = 0;
+                        var position = -1;
+                        while (i < likelihoodRank.length) {
+                            var p = likelihoodRank[i].p;
+                            if (source.probability >= p) {
+                                position = i;
+                                break;
+                            }
+                            i++;
+                        }
+                        if (position == -1) {
+                            likelihoodRank.push(o);
+                        }
+                        else {
+                            likelihoodRank.splice(position, 0, o);
+                        }
+                    }
+
+                    //if we are in reactive mode
+
+                    /*if(mode == 1){
+                     reactive();
+                     var a=alertNodes.slice(0,indexOfPreview)
+                     var node = d3.selectAll(".node").filter(function(e){
+                     return a.indexOf(e.name)!=-1;
+                     })
+                     node.selectAll("circle").style("fill","red");
+                     
+                     node.filter(function(d){
+                     return d.name==alertNodes[indexOfPreview-1];
+                     }).select("circle")
+                     .transition()
+                     .duration(500)
+                     .attr("r", 10)
+                     .style("fill","red")
+                     .each("end", function(){
+                     d3.select(this)
+                     .transition()
+                     .duration(500)
+                     .attr("r", 7);
+                     });
+                     }*/
+                    //blink animation
+                    if (mode == 0) {
+                        divPreview.transition().duration(500).style("border-color", "#fff");
+                    }
+                    else {
+                        //console.log(idInstantiated +" ////// "+indexOfPreview)
+                        if (idInstantiated === indexOfPreview) {
+                            divPreview.transition().duration(500).style("border-color", "#f00");
+                        }
+                        else {
+                            divPreview.transition().duration(500).style("border-color", "#fff");
+                        }
+                    }
+
+                });
+
+
+
+
+                /*svgPreview.on("click", function() {
+                 
+                 //delete temporary accumulate arcs
+                 d3.selectAll("#tempArc").remove();
+                 
+                 //if we are in proactive mode we add the graphs on the map
+                 if(mode==0){
+                 var div=d3.select(d3.select(this).node().parentNode);
+                 var index=(div.attr("id")).match(/[0-9]+/)[0];
+                 var j = "json attack/attack"+index+".json";
+                 if(div.style("border-top-color")=="rgb(255, 255, 255)"){
+                 div.style("border-color","yellow");
+                 if(queueSVG.length==0){
+                 createChart(j,index);
+                 createGraph(j,index,0);
+                 }
+                 else{
+                 //set last svg display property to none 
+                 var last=queueSVG[queueSVG.length-1];
+                 d3.select("#svgTable_"+last).attr("display","none");
+                 //add new chart
+                 createChart(j,index);
+                 createGraph(j,index,0);
+                 }
+                 queueSVG.push(index);
+                 }
+                 else{			
+                 div.style("border-color","white");
+                 removeGraphAndChart(index);
+                 layer.selectAll("#lineStaticAttack"+index).remove();
+                 //delete from list
+                 var indexOfSVG = queueSVG.indexOf(index);
+                 queueSVG.splice(indexOfSVG,1);
+                 //if the list is not empty, set display property of the last svg to initial
+                 if(queueSVG.length>0){
+                 var last=queueSVG[queueSVG.length-1];
+                 d3.select("#svgTable_"+last).attr("display","initial");
+                 }
+                 }
+                 
+                 }
+                 });*/
+
+                drawPreview(indexOfPreview, svgPreview, json);
+
+            }
 
         </script>
 
