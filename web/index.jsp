@@ -32,65 +32,123 @@
 
         <!-- <button type="button" class="button" id="btn" onclick="changeMode()">Proactive</button>-->
         <script type="text/javascript">
-            // Create the Google Mapâ¦
+
+            // Create the Google Map
             var map = new google.maps.Map(d3.select("#map").node(), {
                 zoom: 11,
                 center: new google.maps.LatLng(41.859307, 12.596115), //center of rome
                 mapTypeId: google.maps.MapTypeId.ROADMAP
                         //draggable : false
             });
-            //map.setOptions({scrollwheel: false});
-            //redraw function on zoom
+            var currentPreviewIndex = 0;
+            var styles = [
+                {
+                    "featureType": "road",
+                    "elementType": "labels",
+                    "stylers": [
+                        {"visibility": "off"}
+                    ]
+                }, {
+                    "featureType": "poi",
+                    "stylers": [
+                        {"visibility": "off"}
+                    ]
+                }, {
+                    "featureType": "transit.station",
+                    "elementType": "labels",
+                    "stylers": [
+                        {"visibility": "off"}
+                    ]
+                }
+            ];
+
+            map.setOptions({styles: styles});
+//map.setOptions({scrollwheel: false});
+//redraw function on zoom
             google.maps.event.addListener(map, 'zoom_changed', function () {
-                var attack = d3.selectAll(".lineStaticAttack");
 
-                var array = attack[0];
-                var arrayID = [];
-                //get the relative number of the drawn arcs
-                array.forEach(function (d) {
-                    var id = d.id.match(/[0-9]+/)[0];
-                    if (arrayID.indexOf(id) == -1)
-                        arrayID.push(id);
-                });
+//                var lineStaticAttacks = d3.selectAll(".lineStaticAttack");
+//
+//                var array = lineStaticAttacks[0];
+//                var arrayID = [];
+//                //get the relative number of the drawn arcs
+//                array.forEach(function (d) {
+//                    var id = d.id.match(/[0-9]+/)[0];
+//                    if (arrayID.indexOf(id) == -1)
+//                        arrayID.push(id);
+//                });
+//                //console.log(arrayID);
+//                lineStaticAttacks.remove();
+//
+//                //redraw the arcs
+//                arrayID.forEach(function (d) {
+//                    var json = "json attack/attack" + d + ".json";
+//                    createGraph(json, d, 0);
+//                });
+//
+//                //instantiate version
+//                var attack = d3.selectAll(".lineInstantiateAttack");
+//                //console.log(".lineInstantiateAttack array: ");
+//                //console.log(attack);
+//                var array = attack[0];
+//                var arrayID = [];
+//                //get the relative number of the drawn arcs
+//                array.forEach(function (d) {
+//                    var id = d.id.match(/[0-9]+/)[0];
+//                    if (arrayID.indexOf(id) == -1)
+//                        arrayID.push(id);
+//                });
+//
+//                attack.remove();
+//                //delete previews
+//                //d3.selectAll(".attackPreview").selectAll("svg").selectAll("path").remove();
+//                // d3.selectAll(".attackPreview").selectAll("svg").selectAll("circle").remove();
+//                //d3.selectAll(".attackPreview").selectAll("svg").selectAll("rect").remove();
+//                //redraw the arcs
+//                arrayID.forEach(function (d) {
+//                    var json = "json attack/attack" + d + ".json";
+//                    createGraph(json, d, 1);
+//                });
+//
+//
+//                var attack = d3.selectAll(".lineInstantiateOnGoingAttack");
+//                var array = attack[0];
+//                var arrayID = [];
+//                //get the relative number of the drawn arcs
+//                array.forEach(function (d) {
+//                    var id = d.id.match(/[0-9]+/)[0];
+//                    if (arrayID.indexOf(id) == -1)
+//                        arrayID.push(id);
+//                });
+//
+//                attack.remove();
+//                //delete previews
+//                //d3.selectAll(".attackPreview").selectAll("svg").selectAll("path").remove();
+//                // d3.selectAll(".attackPreview").selectAll("svg").selectAll("circle").remove();
+//                //d3.selectAll(".attackPreview").selectAll("svg").selectAll("rect").remove();
+//                //redraw the arcs
+//                arrayID.forEach(function (d) {
+//                    var json = "json attack/attack" + d + ".json";
+//                    createGraph(json, d, 1);
+//                });
+//
+//                /*
+//                 for(var i=1;i<7;i++)
+//                 drawFunc(i);*/
+                removeAllElements();
+                for (var i = 1; i < currentPreviewIndex; ++i)
+                    reactiveAlert(i, 0, 0);
 
-                attack.remove();
-                //redraw the arcs
-                arrayID.forEach(function (d) {
-                    var json = "json attack/attack" + d + ".json";
-                    createGraph(json, d, 0);
-                });
+                setTimeout(function () {
+                    reactiveAlert(currentPreviewIndex, 300, 100);
+                }, 1000);
 
-                //instantiate version
-                var attack = d3.selectAll(".lineInstantiateAttack");
-
-                var array = attack[0];
-                var arrayID = [];
-                //get the relative number of the drawn arcs
-                array.forEach(function (d) {
-                    var id = d.id.match(/[0-9]+/)[0];
-                    if (arrayID.indexOf(id) == -1)
-                        arrayID.push(id);
-                });
-
-                attack.remove();
-                //delete previews
-                //d3.selectAll(".attackPreview").selectAll("svg").selectAll("path").remove();
-                // d3.selectAll(".attackPreview").selectAll("svg").selectAll("circle").remove();
-                //d3.selectAll(".attackPreview").selectAll("svg").selectAll("rect").remove();
-                //redraw the arcs
-                arrayID.forEach(function (d) {
-                    var json = "json attack/attack" + d + ".json";
-                    createGraph(json, d, 1);
-                });
-                /*
-                 for(var i=1;i<7;i++)
-                 drawFunc(i);*/
             });
             var h = parseInt(window.innerHeight),
                     w = parseInt(window.innerWidth),
                     mode = 1, //0=proactive, 1=reactive
-                    alertIndex = 0;
-            overlay = 0,
+                    alertIndex = 0,
+                    overlay = 0,
                     sideFlag = 0, //0 open, 1 hidden
                     bottomFlag = 0, //0 open, 1 hidden
                     sizeLabel = 50,
@@ -98,10 +156,19 @@
                     borderAttackPreview = 2,
                     totalEdges = [],
                     totalNode = [],
-                    alertNodes = ["192.168.1.13", "192.168.1.12", "192.168.4.3", "192.168.2.4", "192.168.2.89", "192.168.1.9", "192.168.1.16", "192.168.1.1", "192.168.1.17"],
+                    alertNodes = [
+                        "192.168.1.13",
+                        "192.168.1.12",
+                        "192.168.4.3",
+                        "192.168.2.4",
+                        "192.168.2.89",
+                        "192.168.1.9",
+                        "192.168.1.16",
+                        "192.168.1.1",
+                        "192.168.1.17"],
                     subnetList = [],
-                    queueSVG = [];
-            wSideMenu = w * 0.20,
+                    queueSVG = [],
+                    wSideMenu = w * 0.20,
                     hBottomMenu = h * 0.25,
                     width = wSideMenu,
                     height = wSideMenu,
@@ -124,13 +191,13 @@
                     wSVGPreview = wAttackPreview,
                     hPreviewDiv = 35,
                     likelihoodRank = [],
-                    idInstantiated = -1;
-            hSVGPreview = hBottomMenu,
+                    idInstantiated = -1,
+                    hSVGPreview = hBottomMenu,
                     json_file = "dati1.json";
 
+            var nodeRadius = 7;
 
             var globalAttackEvolution = 0;
-            var cioppo;
             var totalAttacks = [];
             var totalResponse = [];
             var barWidth = "10px";
@@ -167,7 +234,7 @@
                     // We could use a single SVG, but what size would it have?
                     overlay.draw = function () {
                         projection = this.getProjection(),
-                                padding = 10;
+                                padding = 25;
 
                         var force = d3.layout.force()
                                 .nodes(totalNode)
@@ -185,6 +252,10 @@
                          .attr("xlink:href", "img/button_menu.png")
                          .attr('width', 25)
                          .attr('height', 25);*/
+                        //group elements to manage alightment on links and nodes
+                        //node are always in front of links
+                        layer.append("g").attr("id", "links");
+                        layer.append("g").attr("id", "nodes");
 
                         //marker for arrows map
                         layer.append("svg:defs").append("svg:marker") // This section adds in the arrows
@@ -203,8 +274,8 @@
                         layer.append("svg:defs").append("svg:marker") // This section adds in the arrows
                                 .attr("id", "preview")
                                 .attr("viewBox", "0 -5 10 10")
-                                .attr("refX", 13)
-                                .attr("refY", -1)
+                                .attr("refX", 10)
+                                .attr("refY", 0)
                                 .attr("markerWidth", 4)
                                 .attr("markerHeight", 10)
                                 .attr("orient", "auto")
@@ -215,8 +286,21 @@
                         layer.append("svg:defs").append("svg:marker") // This section adds in the arrows
                                 .attr("id", "instantiate")
                                 .attr("viewBox", "0 -5 10 10")
-                                .attr("refX", 13)
-                                .attr("refY", -1)
+                                .attr("refX", 10)
+                                .attr("refY", 0)
+                                .attr("markerUnits", "userSpaceOnUse")
+                                .attr("markerWidth", 15)
+                                .attr("markerHeight", 15)
+                                .attr("orient", "auto")
+                                .append("svg:path")
+                                .attr("d", "M0,-5L10,0L0,5");
+
+                        //marker for arrows instantiateDone attack
+                        layer.append("svg:defs").append("svg:marker") // This section adds in the arrows
+                                .attr("id", "instantiateDone")
+                                .attr("viewBox", "0 -5 10 10")
+                                .attr("refX", nodeRadius + 7)
+                                .attr("refY", 0)
                                 .attr("markerUnits", "userSpaceOnUse")
                                 .attr("markerWidth", 15)
                                 .attr("markerHeight", 15)
@@ -227,7 +311,7 @@
                         d3.selectAll(".line").remove();
                         d3.selectAll(".barrier").remove();
 
-                        var edges = layer.selectAll(".line")
+                        var edges = layer.select("#links").selectAll(".line")
                                 .data(totalEdges)
                                 //.each(transformLine)
                                 .enter()
@@ -239,11 +323,6 @@
                                     var d2 = new google.maps.LatLng(d.target.x, d.target.y);
                                     d1 = projection.fromLatLngToDivPixel(d1);
                                     d2 = projection.fromLatLngToDivPixel(d2);
-                                    /*return d3.select(this)
-                                     .attr("x1", (d1.x + svgshifting))
-                                     .attr("y1", (d1.y + svgshifting))
-                                     .attr("x2", (d2.x + svgshifting))
-                                     .attr("y2", (d2.y + svgshifting));*/
                                     var d1x = d1.x + svgshifting;
                                     var d1y = d1.y + svgshifting;
                                     var d2x = d2.x + svgshifting;
@@ -267,7 +346,7 @@
                          .style("fill","red")*/
 
 
-                        var nodes = layer.selectAll(".node")
+                        var nodes = layer.select("#nodes").selectAll(".node")
                                 .data(totalNode)
                                 .each(transformNode)
                                 .enter()
@@ -276,7 +355,7 @@
                                 .attr("class", "node");
 
                         nodes.append("circle")
-                                .attr("r", 7) //possiamo cambiare la dimensione del nodo
+                                .attr("r", nodeRadius) //possiamo cambiare la dimensione del nodo
                                 .style("fill", "#3d3d3d")
                                 .attr("cx", padding)
                                 .attr("cy", padding);
@@ -289,18 +368,13 @@
                                     return d.name;
                                 });
 
-                        function replacePoints(string)
-                        {
-                            var res = "";
-                            for (l = 0; l < string.length; l++)
-                            {
-                                if (string[l] === ".")
-                                    res = res + "p";
-                                else
-                                    res = res + string[l];
-                            }
-                            return res;
-                        }
+
+
+                        /**
+                         * Fills originalPos var and returns x and y
+                         * @param {type} d
+                         * @returns two filled atrributes x and y
+                         */
                         function transformNode(d) {
                             var n = d.name;
                             d = new google.maps.LatLng(d.x, d.y);
@@ -342,7 +416,7 @@
 
                 //donut chart
 
-                // Bind our overlay to the mapâ¦
+                // Bind our overlay to the map
                 overlay.setMap(map);
                 removeElements();
                 drawDonutChart();
@@ -350,32 +424,31 @@
 
             function drawPreviews() {
 
-                var time = 3000;
+                //var time = 3000;
                 if (mode == 0)
                 {
                     var time = 3000;
                     for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
-
-
                         var myVar = setTimeout("drawFunc(" + indexOfPreview + ")", time);
                         time = time + 5000;
                     }
                 }
                 else
                 {
-                    var time = 0;
-                    var tt = 10000;
                     for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
-
-
-                        var myVar = setTimeout("drawFuncReactive(" + indexOfPreview + ")", time);
-                        //time=time+5000;
+                        drawFuncReactive(indexOfPreview);
                     }
-                    for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
-
-                        var myVar = setTimeout("reactiveAlert(" + indexOfPreview + ")", tt);
-                        tt = tt + 5000;
-                    }
+//                    
+//                        var time = 0;
+//                    var tt = 1000;
+//                    for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
+//                        var myVar = setTimeout("drawFuncReactive(" + indexOfPreview + ")", time);
+//                        //time=time+5000;
+//                    }
+//                    for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
+//                        var myVar = setTimeout("reactiveAlert(" + indexOfPreview + ")", tt);
+//                        tt = tt + 1000;
+//                    }
 
                 }
             }
@@ -390,7 +463,18 @@
                 d3.selectAll(".gmnoprint").remove();
                 d3.select(".gm-style-cc").remove();
                 d3.select("a").remove();
-                d3.selectAll(".attackPreview").remove();
+                //d3.selectAll(".attackPreview").remove();
+                d3.selectAll(".lineStaticAttack").remove();
+                d3.selectAll(".lineInstantiateAttack").remove();
+                d3.selectAll(".lineInstantiateOnGoingAttack").remove();
+                d3.selectAll(".barrier").remove();
+                //reset all lines
+                d3.selectAll(".line").style("opacity", 0.1);
+                //reset all node
+                d3.selectAll(".node").selectAll("circle")
+                        .style("fill", "#3d3d3d")
+                        .attr("r", nodeRadius)
+                        .attr("stroke", "none");
             }
 
             function createNodeList(source) {
@@ -1100,27 +1184,20 @@
                         yOffset += parseInt(radius * 0.1) + 1;
                         graphAttack.push(s_attack.source.name);
                     });
-
-
-
-
                 });
-
-
             }
 
-            function createGraph(json, x, type) {
-                //reset all lines
-                d3.selectAll(".line").style("opacity", 0.1);
-                //reset all node
-                d3.selectAll(".node").selectAll("circle").style("fill", "#3d3d3d");
+            function createGraph(json, attackIndex, type) { //attackIndex = likelihoodRank[0].id;
+//                //reset all lines
+//                d3.selectAll(".line").style("opacity", 0.1);
+//                //reset all node
+//                d3.selectAll(".node").selectAll("circle").style("fill", "#3d3d3d");
 
                 var index = 0,
                         graphAttack = [],
                         lines = [];
-                d3.json(json, function (source) {
-                    var i = 0;
 
+                d3.json(json, function (source) {
                     source.attack.forEach(function (d) {
                         graphAttack.push(d.source.name);
                     });
@@ -1145,35 +1222,25 @@
                         });
                     }
 
-                    //d3.selectAll(".node").filter(function (e)){
-                    //graphAtta
-                    //	}
-                    //cioppo=lines;
-
-
                     var ap = getAttackArray(lines);  //contains the attack path in the form of an array of nodes
-                    //console.log(cioppo);
-                    var path = layer.append("svg:g")
+                    var path = layer.select("#links").append("svg:g")
                             .selectAll("path")
                             .data(lines)
-                            .enter().append("svg:path")
+                            .enter()
+                            .append("svg:path")
                             .attr("d", function (d) {
 
                                 var d1 = new google.maps.LatLng(d.source.x, d.source.y);
                                 var d2 = new google.maps.LatLng(d.target.x, d.target.y);
                                 d1 = projection.fromLatLngToDivPixel(d1);
                                 d2 = projection.fromLatLngToDivPixel(d2);
-
                                 var x1 = d1.x + svgshifting;
                                 var y1 = d1.y + svgshifting;
-
                                 var x2 = d2.x + svgshifting;
                                 var y2 = d2.y + svgshifting;
-
                                 var dx = x2 - x1,
                                         dy = y2 - y1,
                                         dr = Math.sqrt(dx * dx + dy * dy);
-
                                 return "M" +
                                         x1 + "," +
                                         y1 + "A" +
@@ -1181,25 +1248,33 @@
                                         x2 + "," +
                                         y2;
                             })
-                            .attr("class", function (d, i) {
+                            .attr("class", function () {
                                 if (type == 0) //static attack graph
                                     return "lineStaticAttack";
                                 else
-                                {
-                                    //cioppo=lines;
-                                    //console.log(lines)
-                                    //console.log(i+"----"+globalAttackEvolution)
-                                    if ((i < globalAttackEvolution) && alertNodes[i + 1] === ap[i + 1])
-                                        return "lineInstantiateAttack";
-                                    else
-                                        return "lineInstantiateOnGoingAttack";
-                                }
+//                                {
+//                                    //console.log(lines)
+//                                    //console.log(i+"----"+globalAttackEvolution)
+//                                    if ((i < globalAttackEvolution) && alertNodes[i + 1] === ap[i + 1]) {
+//                                        console.log("(i < globalAttackEvolution) && alertNodes[i + 1] === ap[i + 1]");
+//                                        console.log("(" + i + " < " + globalAttackEvolution + ") && " + alertNodes[i + 1] + " === " + ap[i + 1]);
+//                                        return "lineInstantiateAttack";
+//
+//                                    }
+//                                    else
+                                    return "lineInstantiateOnGoingAttack";
+//                                }
                             })
                             .attr("id", function () {
                                 if (type == 0) //static attack graph
-                                    return "lineStaticAttack" + x;
+                                    return "lineStaticAttack" + attackIndex;
                                 else
-                                    return "lineInstantiateAttack" + x;
+//                                {
+//                                    if ((i < globalAttackEvolution) && alertNodes[i + 1] === ap[i + 1])
+//                                        return "lineInstantiateAttack" + attackIndex;
+//                                    else
+                                    return "lineInstantiateOnGoingAttack" + attackIndex;
+//                                }
                             })
                             .style("stroke-width", function () {
                                 if (type == 0) { //static attack graph
@@ -1219,13 +1294,73 @@
                                     function () {
                                         if (type == 0) //static attack graph
                                             return "url(#end)";
-                                        else {
+                                        else
                                             return "url(#instantiate)";
-                                        }
                                     });
                 });
             }
 
+            /**
+             * Draw lineInstantiateAttack lines separately on the base on alertNodes
+             * @returns {undefined}
+             */
+            function drawAttackGraph() {
+                //let's draw lineInstantiateAttack lines separately on the base on alertNodes
+                // if (type == 1) {
+                d3.selectAll(".lineInstantiateAttack").remove();
+                var alertedNodesList = alertNodes.slice(0, currentPreviewIndex);
+                var instantiateAttackLines = [];
+                if (alertedNodesList.length > 1) {
+                    for (var index = 0; index < (alertedNodesList.length - 1); index++) {
+                        var sourceNode;
+                        var targetNode;
+                        totalNode.forEach(function (d) {
+                            if (d.name == alertedNodesList[index])
+                                sourceNode = d;
+                            if (d.name == alertedNodesList[index + 1])
+                                targetNode = d;
+                        });
+                        instantiateAttackLines.push({
+                            source: sourceNode,
+                            target: targetNode
+                        });
+                    }
+                }
+
+                layer.select("#links").append("svg:g")
+                        .selectAll("path")
+                        .data(instantiateAttackLines)
+                        .enter()
+                        .append("svg:path")
+                        .attr("d", function (d) {
+                            var d1 = new google.maps.LatLng(d.source.x, d.source.y);
+                            var d2 = new google.maps.LatLng(d.target.x, d.target.y);
+                            d1 = projection.fromLatLngToDivPixel(d1);
+                            d2 = projection.fromLatLngToDivPixel(d2);
+                            var x1 = d1.x + svgshifting;
+                            var y1 = d1.y + svgshifting;
+                            var x2 = d2.x + svgshifting;
+                            var y2 = d2.y + svgshifting;
+                            var dx = x2 - x1,
+                                    dy = y2 - y1,
+                                    dr = Math.sqrt(dx * dx + dy * dy);
+                            return "M" +
+                                    x1 + "," +
+                                    y1 + "A" +
+                                    dr + "," + dr + " 0 0,1 " +
+                                    x2 + "," +
+                                    y2;
+                        })
+                        .attr("class", "lineInstantiateAttack")
+                        .attr("id", "lineInstantiateAttack" + currentPreviewIndex)
+                        .style("stroke-width", 6)
+                        .attr("marker-end", "url(#instantiateDone)");
+                // }
+            }
+            /**
+             * Transform oject of nodes into array on IP adresses
+             * @param {type} arlines
+             */
             function getAttackArray(arlines)
             {
                 var result = [];
@@ -1325,6 +1460,50 @@
                         .append("g")
                         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+
+                sideMenu.append("button")
+                        .style("width", 75 + "px")
+                        .style("height", 25 + "px")
+                        .text("Play 1")
+                        .on("click", function () {
+                            currentPreviewIndex++;
+                            if (currentPreviewIndex == 10) {
+                                removeAllElements();
+                                drawPreviews();
+                                currentPreviewIndex = 1;
+                                d3.select(this).text("Play " + currentPreviewIndex);
+                            }
+                            else {
+                                reactiveAlert(currentPreviewIndex, 500, 200);
+                            }
+
+                            if (currentPreviewIndex == 10)
+                                d3.select(this).text("Clear");
+                            else
+                                d3.select(this).text("Play " + currentPreviewIndex);
+
+
+                        });
+
+                sideMenu.append("button")
+                        .style("width", 75 + "px")
+                        .style("height", 25 + "px")
+                        .text("Play all")
+                        .on("click", function () {
+                            currentPreviewIndex = 1;
+                            removeAllElements();
+                            var tt = 1000;
+                            drawPreviews();
+
+                            for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
+                                setTimeout(function () {
+                                    reactiveAlert(currentPreviewIndex, 500, 200);
+                                    currentPreviewIndex++;
+                                }, tt);
+                                tt = tt + 2000;
+                            }
+                        });
+
                 sideMenu.append("button")
                         .style("width", 75 + "px")
                         .style("height", 25 + "px")
@@ -1332,11 +1511,9 @@
                         .on("click", function () {
                             //location.reload();
                             removeAllElements();
-                            drawPreviews();
                         });
 
                 //Append Response Plan DIV
-
                 sideMenu.append("div")
                         .attr("id", "responseText")
                         .style("width", wSideMenu + "px")
@@ -1573,11 +1750,12 @@
                         idInstantiated = bestMatch(likelihoodRank, indexOfAlert);
                         //console.log("PARAPPPAAAAAAA---- "+idInstantiated);
                         d3.selectAll(".lineStaticAttack").remove();
-                        d3.selectAll(".lineInstantiateAttack").remove();
+
                         d3.selectAll(".lineInstantiateOnGoingAttack").remove();
                         d3.select(".tableAttack").selectAll("svg").remove();
-                        d3.selectAll(".line").style("opacity", 0.2);
+                        d3.selectAll(".line").style("opacity", 0.1);
                         d3.select(".bottomMenu").selectAll(".attackPreview").style("border-color", "white");
+                        d3.selectAll(".barrier").transition().attr("fill-opacity", 0.1).attr("stroke-opacity", 0.1);
                         //d3.select(".bottomMenu").style("pointer-events","none");
                         //d3.select(".bottomMenuLabel").style("display","none");
                         queueSVG = [];
@@ -1589,7 +1767,7 @@
                         //}
                     }
                 }
-                mode = 1;
+                //playmode = 1;
             }
 
             function proactive() {
@@ -1681,10 +1859,6 @@
                     }
 
                 });
-
-
-
-
                 svgPreview.on("click", function () {
 
                     //delete temporary accumulate arcs
@@ -1732,6 +1906,20 @@
 
             }
 
+            function replacePoints(string)
+            {
+                var res = "";
+                for (l = 0; l < string.length; l++)
+                {
+                    if (string[l] === ".")
+                        res = res + "_";
+                    else
+                        res = res + string[l];
+                }
+                return res;
+            }
+
+
             function getNode(node)
             {
                 for (k = 0; k < totalNode.length; k++)
@@ -1739,6 +1927,7 @@
                     if (totalNode[k].name === node)
                         return totalNode[k];
                 }
+                console.log("(!) getNode(node): node " + node + " is not found in totalNode");
             }
 
             function computeBarrier(index, s, t)
@@ -1755,61 +1944,67 @@
                 return result;
             }
 
-            function perimeter(activeNode)
+            function perimeter(indexOfPreview)
             {
+                var activeNode = alertNodes[indexOfPreview - 1];
                 var activeEdges = [];
-                for (k = 0; k < totalEdges.length; k++)
+                for (var k = 0; k < totalEdges.length; k++)
                 {
                     if (totalEdges[k].source.name === activeNode)
                         activeEdges.push(totalEdges[k]);
                 }
-                //console.log(activeEdges);
+                //Active attack predicted edges which are then covered by barriers  
 
-                //sono con strutture diverse
                 var activeAttackEdges = [];
-                for (h = 0; h < totalAttacks.length; h++)
+                for (var h = 0; h < totalAttacks.length; h++)//for all attacs
                 {
-                    for (k = 0; k < totalAttacks[h].attack.length; k++)
+                    for (var k = 0; k < totalAttacks[h].attack.length; k++)//for each attack path in attack
                     {
-                        if (totalAttacks[h].attack[k].source.name === activeNode)
+                        outerloop:
+                                if (totalAttacks[h].attack[k].source.name === activeNode)//if attack path goes from our activeNode 
                         {
-                            var barrier = [];
+                            //we compute mitigations anyway
                             var s = totalAttacks[h].attack[k].source.name;
                             var t = totalAttacks[h].attack[k].target.name;
-                            barrier = computeBarrier(h, s, t);
-                            var o = {source: getNode(s),
-                                target: getNode(t),
-                                barrier: barrier};
-                            activeAttackEdges.push(o);
+                            var mitigationActions = computeBarrier(h, s, t);
+                            var barrierData = {
+                                attackId: h,
+                                barrier: mitigationActions
+                            };
+                            for (var i = 0; i < activeAttackEdges.length; i++) {//for all activeAttackEdges
+                                if (totalAttacks[h].attack[k].target.name === activeAttackEdges[i].target.name) {//We see if there exsist the same edge in our activeAttackEdges
+                                    //we only add mitigations to the existing edge
+                                    activeAttackEdges[i].barrierData.push(barrierData);
+                                    break outerloop; //to skip adding new new edge to activeAttackEdges
+                                }
+                            }
+                            //if there is no edge, we add new new edge to activeAttackEdges
+                            if (totalAttacks[h].attack[k].target.name != "x") { //if not the last node though
+                                var o = {
+                                    source: getNode(s),
+                                    target: getNode(t),
+                                    barrierData: [barrierData]
+                                };
+                                activeAttackEdges.push(o);
+                            }
                         }
                     }
-
                 }
-                //console.log(activeAttackEdges);
+                var maxAttacksPerEdge = 0;
+                activeAttackEdges.forEach(function (d) {
+                    if (d.barrierData.length > maxAttacksPerEdge)
+                        maxAttacksPerEdge = d.barrierData.length;
+                });
+                var scaleStrokeWidth = d3.scale.linear()
+                        .domain([0, maxAttacksPerEdge])
+                        .range([2, 6]);
 
-                //console.log("-------- "+ activeNode);
-                var previousArcs = true;
-
-                /*              var s;
-                 var t;
-                 totalNode.forEach(function(d) {
-                 
-                 if (d.name == x1)
-                 s = d;
-                 if (d.name == x2)
-                 t = d;
-                 })
-                 lines.push({
-                 source: s,
-                 target: t
-                 })*/
-
-                var path = layer.append("svg:g")
+                layer.select("#links").append("svg:g")
                         .selectAll("path")
                         .data(activeAttackEdges)
-                        .enter().append("svg:path")
+                        .enter()
+                        .append("svg:path")
                         .attr("d", function (d) {
-
                             var d1 = new google.maps.LatLng(d.source.x, d.source.y);
                             var d2 = new google.maps.LatLng(d.target.x, d.target.y);
                             d1 = projection.fromLatLngToDivPixel(d1);
@@ -1817,7 +2012,6 @@
 
                             var x1 = d1.x + svgshifting;
                             var y1 = d1.y + svgshifting;
-
                             var x2 = d2.x + svgshifting;
                             var y2 = d2.y + svgshifting;
 
@@ -1832,139 +2026,25 @@
                                     x2 + "," +
                                     y2;
                         })
-                        .attr("class", function (d, i) {
-                            return "lineStaticAttack";
+                        .attr("class", "lineStaticAttack")
+                        .style("stroke-width", function (d) {
+                            return scaleStrokeWidth(d.barrierData.length);
                         })
-                        .style("stroke-width", "5px");
+                        .attr("id", "lineStaticAttack" + indexOfPreview);
 
+                d3.selectAll(".barrier").transition().attr("fill-opacity", 0.1).attr("stroke-opacity", 0.1);
 
-                var datiLunghezze = [];
-                layer.selectAll(".lineStaticAttack")
-                        .each(function (d, i) {
-                            var l = this.getTotalLength();
-                            var p = this.getPointAtLength(0.9 * l);
-                            datiLunghezze[i] = p;
-                        });
-
-                d3.selectAll(".barrier").transition().attr("fill-opacity", 0.1);
-                d3.selectAll(".barrierGreen").transition().attr("fill-opacity", 0.1);
-                d3.selectAll(".barrierRed").transition().attr("fill-opacity", 0.1);
-
-                for (k = 0; k < datiLunghezze.length; k++)
-                {
-                    //console.log(k);
-                    var actual = 0;
-                    createBarrier(activeAttackEdges[k], k, datiLunghezze, actual);
-                    actual = actual + 1;
-                    /*layer.append("circle")
-                     .attr("class","barrier")
-                     .attr("cx",function(){
-                     var p=datiLunghezze[k];
-                     //console.log(p);
-                     return p.x;
-                     })
-                     .attr("cy",function(){
-                     var p=datiLunghezze[k];
-                     return p.y;
-                     })
-                     .attr("r",10)
-                     .style("fill","yellow");*/
-                }
-
-                //.node().getPointAtLength(1.0 * l)
-
-
-
-
+                createBarrier(activeAttackEdges);
 
                 //black links
                 var outgoingLinks = layer.selectAll(".line").filter(function (d) { //outgoing arcs
                     return (d.source.name === activeNode);
                 })
-                        .style("stroke-width", "5px")
-                        .style("opacity", "1.0");
-                //console.log(outgoingLinks);
-
-                d3.select(window)
-                        .on("keydown", function () {
-                            console.log(activeAttackEdges[0]);
-                            var mitigations = activeAttackEdges[0].barrier;
-                            var countMitigations = mitigations.length;
-                            var success = 0;
-                            for (m = 0; m < countMitigations; m++)
-                            {
-                                if (mitigations[m].mitigation.status === "success")
-                                    success = success + 1;
-                            }
-                            var failed = countMitigations - success;
-                            var step = 10;
-                            var count = 1;
-
-                            d3.select("#responseText")
-                                    .html("<b>Barrier of Mitigation Actions</b>");
-
-                            var barlayer = d3.select("#responseText")
-                                    .append("svg")
-                                    .attr("width", "200px")
-                                    .attr("height", "200px")
-                                    .style("fill", "white");
-
-                            for (j = 0; j < mitigations.length; j++)
-                            {
-                                if ((mitigations[j].mitigation.status == "inactive") || (mitigations[j].mitigation.status == "failed"))
-                                {
-                                    console.log("eccomi");
-                                    barlayer.append("svg:rect")
-                                            .datum(mitigations[j].mitigation)
-                                            .attr("x", "10px")
-                                            .attr("y", function () {
-                                                return count * 20;
-                                            })
-                                            .attr("width", "50px")
-                                            .attr("height", "20px")
-                                            .style("fill", "red")
-                                            .style("stroke", "black")
-                                            .style("stroke-width", "2px")
-                                            .on("click", function (d) {
-                                                showDetails(d);
-                                            });
-
-                                    count = count + 1;
-                                }
-                            }
-
-                            for (j = 0; j < mitigations.length; j++)
-                            {
-                                if (mitigations[j].mitigation.status == "success")
-                                {
-                                    console.log("eccomi");
-                                    barlayer.append("svg:rect")
-                                            .datum(mitigations[j].mitigation)
-                                            .attr("x", "10px")
-                                            .attr("y", function () {
-                                                return count * 20;
-                                            })
-                                            .attr("width", "50px")
-                                            .attr("height", "20px")
-                                            .style("fill", "green")
-                                            .style("stroke", "black")
-                                            .style("stroke-width", "2px")
-                                            .on("click", function (d) {
-                                                showDetails(d);
-                                            });
-
-                                    count = count + 1;
-                                }
-                            }
-
-
-
-
-
-                        });
+                        //.style("stroke-width", "5px")
+                        .style("opacity", "0.5");
             }
 
-            function creaBar(mitigations)
+            function mitigationsPreview(mitigations)
             {
                 var countMitigations = mitigations.length;
                 var success = 0;
@@ -1991,7 +2071,6 @@
                 {
                     if ((mitigations[j].mitigation.status == "inactive") || (mitigations[j].mitigation.status == "failed"))
                     {
-                        console.log("eccomi");
                         barlayer.append("svg:rect")
                                 .datum(mitigations[j].mitigation)
                                 .attr("x", "5px")
@@ -2024,7 +2103,6 @@
                 {
                     if (mitigations[j].mitigation.status == "success")
                     {
-                        console.log("eccomi");
                         barlayer.append("svg:rect")
                                 .datum(mitigations[j].mitigation)
                                 .attr("x", "5px")
@@ -2053,18 +2131,11 @@
                         count = count + 1;
                     }
                 }
-
-
-
-
-
-
             }
-
 
             function showDetails(data, h)
             {
-                console.log(h);
+                //console.log(h);
                 d3.select("#barrierDetailsArea")
                         .append("text")
                         .attr("x", "70px")
@@ -2075,119 +2146,175 @@
                         .text("ID: " + data.ID + " type: " + data.name + " node: " + data.edge.target);
             }
 
-            function showData() {
-                console.log("ciao");
-                var m = 10;
-                console.log(m);
-            }
 
-            function createBarrier(edges, iter, datiL, ac)
+            /**
+             * Draws barrier rectangles
+             * @param {type} activeAttackEdges
+             * @returns {undefined}
+             */
+            function createBarrier(activeAttackEdges)
             {
-                console.log(edges);
-                var mitigations = edges.barrier;
-                var countMitigations = mitigations.length;
-                var success = 0;
-                for (m = 0; m < countMitigations; m++)
-                {
-                    if (mitigations[m].mitigation.status === "success")
-                        success = success + 1;
+                for (var j = 0; j < activeAttackEdges.length; j++) {
+                    var rectWidth = 12;
+                    var rectHeight = 60;
+                    var rectStandoff = 15;
+                    var magnifierFactor = 3;
+                    var smallEdgeShifting = 0;
+                    //count all mitigations from all attacks together
+                    var mitigations = [];
+                    for (var i = 0; i < activeAttackEdges[j].barrierData.length; i++) {
+                        mitigations = mitigations.concat(activeAttackEdges[j].barrierData[i].barrier);
+                    }
+                    //count all states of mitifation action 
+                    var success = 0;
+                    var failed = 0;
+                    for (var m = 0; m < mitigations.length; m++)
+                    {
+                        if (mitigations[m].mitigation.status === "success")
+                            success = success + 1;
+                        if (mitigations[m].mitigation.status === "failed")
+                            failed = failed + 1;
+                    }
+                    var inactive = mitigations.length - success - failed;
+
+                    //lets find position data for barrier rectangles
+                    var positionData;
+                    layer.selectAll(".lineStaticAttack")
+                            .filter(function (d) {
+                                return (d.target.name === activeAttackEdges[j].target.name);
+                            })
+                            .each(function () {
+                                var l = this.getTotalLength();
+                                if (l < rectHeight * 1.9) {//if rectange doesnt fit line
+                                    rectHeight = l * 0.6;
+                                    rectStandoff = l * 0.10;
+                                    smallEdgeShifting = 10;
+                                }
+                                var p1 = this.getPointAtLength(l - rectStandoff);
+                                var p2 = this.getPointAtLength(l - rectHeight); // TODO: make secobd it not fixed
+                                var dY = p1.y - p2.y;
+                                var dX = p1.x - p2.x;
+                                var angleInDegrees = (Math.atan2(dY, dX) / Math.PI * 180.0) + 90;
+                                positionData = {
+                                    startPoint: p1,
+                                    angleInDegrees: angleInDegrees
+                                };
+                            });
+
+                    var heightScale = d3.scale.linear()
+                            .domain([0, mitigations.length])
+                            .range([0, rectHeight]);
+
+                    var g = layer.append("g")
+                            .datum(positionData)
+                            .attr("class", "barrier")
+                            .attr("transform", "translate(" +
+                                    (positionData.startPoint.x - rectWidth / 2) +
+                                    "," + (positionData.startPoint.y) +
+                                    ") rotate(" + positionData.angleInDegrees + " " + rectWidth / 2 + " 0)")
+                            .on("mouseover", function (d) {
+                                d3.select(this).transition()
+                                        .duration(200)
+                                        .attr("transform", "translate(" +
+                                                (d.startPoint.x - rectWidth / 2 * magnifierFactor) +
+                                                "," + d.startPoint.y +
+                                                ") rotate(" + d.angleInDegrees + " " +
+                                                rectWidth / 2 * magnifierFactor +
+                                                " 0) scale(" + magnifierFactor + ")");//TODO:....
+                            })
+                            .on("mouseout", function (d) {
+                                d3.select(this).transition()
+                                        .duration(200)
+                                        .attr("transform", "translate(" +
+                                                (d.startPoint.x - rectWidth / 2) +
+                                                "," + (d.startPoint.y) +
+                                                ") rotate(" + d.angleInDegrees + " " +
+                                                rectWidth / 2 + " 0)");
+                            })
+                            .style("cursor", "pointer");
+
+                    g.append("svg:rect")
+                            .attr("x", smallEdgeShifting)
+                            .attr("width", rectWidth)
+                            .attr("height", heightScale(failed))
+                            .style("fill", "red");
+
+                    g.append("svg:rect")
+                            .attr("x", smallEdgeShifting)
+                            .attr("y", heightScale(failed))
+                            .attr("width", rectWidth)
+                            .attr("height", heightScale(success))
+                            .style("fill", "green");
+
+                    g.append("svg:rect")
+                            .attr("x", smallEdgeShifting)
+                            .attr("y", heightScale(failed + success))
+                            .attr("width", rectWidth)
+                            .attr("height", heightScale(inactive))
+                            .style("fill", "gray");
+
+                    g.append("svg:rect")
+                            .datum(mitigations)
+                            .on("click", function (d) {
+                                mitigationsPreview(d);
+                            })
+                            .attr("x", smallEdgeShifting)
+                            .attr("width", rectWidth)
+                            .attr("height", rectHeight)
+                            .style("fill", "white")
+                            .style("fill-opacity", 0)
+                            .style("stroke", "black")
+                            .style("stroke-width", "1px");
                 }
-                var failed = countMitigations - success;
-                var step = 10;
-
-                layer.append("svg:rect")
-                        .transition()
-                        .attr("class", "barrier")
-                        //.attr("id","br"+ac)
-                        .attr("x", datiL[iter].x)
-                        .attr("y", datiL[iter].y)
-                        .attr("width", "10px")
-                        .attr("height", function () {
-                            return countMitigations * 10;
-                        })
-                        .style("fill", "white")
-                        .style("stroke", "black")
-                        .style("stroke-width", "1px");
-
-                layer.append("svg:rect")
-                        .datum(mitigations)
-                        .on("click", function (d) {
-                            console.log("cippippolo");
-                            creaBar(d);
-                        })
-                        .transition()
-                        .attr("class", "barrierGreen")
-                        .attr("x", datiL[iter].x)
-                        .attr("y", function () {
-                            var res = datiL[iter].y + failed * step;
-                            return res;
-                        })
-                        .attr("width", "10px")
-                        .attr("height", function (d) {
-                            var res = step * success;
-                            return res;
-                        })
-                        .style("fill", "green");
-
-
-
-                layer.append("svg:rect")
-                        .datum(mitigations)
-                        .on("click", function (d) {
-                            console.log("cippippolo");
-                            creaBar(d);
-                        })
-                        .transition()
-                        .attr("class", "barrierRed")
-                        .attr("x", datiL[iter].x)
-                        .attr("y", datiL[iter].y)
-                        .attr("width", "10px")
-                        .attr("height", function () {
-                            var res = step * failed;
-                            return res;
-                        })
-                        .style("fill", "red");
-
-                //.transition()
-                //.attr("width","50px");
-
-
             }
 
+            /** 
+             * Draws red and animates attacked nodes
+             * @param {num} indexOfPreview Index of chosen preview
+             * @returns {undefined}
+             */
+            function reactiveAlert(indexOfPreview, duration, delay) {//TODO:clean
+
+                if (mode == 1) {
 
 
-            function reactiveAlert(indexOfPreview) {
-                var json = "json attack/attack" + indexOfPreview + ".json";
-
-                //update likelihood array
-                d3.json(json, function (source) {
-                    if (mode == 1) {
-                        reactive(indexOfPreview);
-                        var a = alertNodes.slice(0, indexOfPreview);
-                        var node = d3.selectAll(".node").filter(function (e) {
-                            return a.indexOf(e.name) != -1;
-                        });
-                        node.selectAll("circle").style("fill", "red");
+                    drawAttackGraph();
+                    var allAlertNodes = alertNodes.slice(0, indexOfPreview); //takes first first indexOfPreview number of nodes from alert nodes
+                    //lets find the nodes and fill them red
+                    var activeNode = alertNodes[indexOfPreview - 1];
 
 
-                        var active = alertNodes[indexOfPreview - 1];
-                        perimeter(active);
+                    var activeAlertNodes = d3.selectAll(".node").filter(function (d) {
+                        return allAlertNodes.indexOf(d.name) != -1;
+                    });
+                    activeAlertNodes.select("circle")
+                            .style("fill", "red")
+                            .attr("r", 8)
+                            .attr("stroke", "none");
 
-                        node.filter(function (d) {
-                            return d.name == alertNodes[indexOfPreview - 1];
-                        }).select("circle")
-                                .transition()
-                                .duration(500)
-                                .attr("r", 10)
-                                .style("fill", "red")
-                                .each("end", function () {
-                                    d3.select(this)
-                                            .transition()
-                                            .duration(500)
-                                            .attr("r", 7);
-                                });
-                    }
-                });
+                    activeAlertNodes.filter(function (d) {
+                        return d.name == activeNode;
+                    }).select("circle")
+                            .transition()
+                            .duration(duration)
+                            .attr("r", 20)
+                            .style("fill", "red")
+                            .each("end", function () {
+                                d3.select(this)
+                                        .transition()
+                                        .delay(delay)
+                                        .duration(duration)
+                                        .attr("r", 11)
+
+                                        .each("end", function () {
+                                            d3.select(this)
+                                                    .attr("stroke", "black")
+                                                    .attr("stroke-width", 2);
+                                            reactive(indexOfPreview);
+                                            perimeter(indexOfPreview);
+                                        });
+                            });
+                }
             }
 
             function drawFuncReactive(indexOfPreview) {
