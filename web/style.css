@@ -1,141 +1,154 @@
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  position: relative;
-  margin: 0px;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    position: relative;
+    margin: 0px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 ::-webkit-scrollbar{ width: 0px; }
 
 .line {
     stroke: #000;
-	stroke-width: 2px;
-	opacity: 0.2;
+    stroke-width: 2px;
+    opacity: 0.2;
 }
 
 .button{
-	top:15px;
-	left:15px;
-	position: absolute;
+    top:15px;
+    left:15px;
+    position: absolute;
 }
 
 .lineStaticAttack {
-	fill: none;
+    fill: none;
     stroke: #ff6600;
 }
 
 .lineInstantiateAttack {
-	fill: none;
-    stroke: #f00;
+    fill: none;
+    stroke: #BF0000;
 }
 
 .lineInstantiateOnGoingAttack {
-	fill: none;
-        opacity: 0.4;
+    fill: none;
+    opacity: 0.4;
     stroke: #f00;
+}
+
+.perimeterArc{
+    fill: none;
+    stroke: #CC7A29;
 }
 
 
 .linePreviewAttack {
-	fill: none;
+    fill: none;
     stroke: #ff6600;
-	stroke-width: 3px;
-}
-
-#end{
-	fill:#ff6600;
-	strokeWidth: 3px;
+    stroke-width: 3px;
 }
 
 #preview{
-	fill:#ff6600;
+    fill:#ff6600;
 }
 
-#instantiate{
-	fill:#f00;
+#lineStaticAttackMarker{
+    fill:#ff6600;
+    strokeWidth: 3px;
+}
+
+#lineInstantiateOnGoingAttackMarker{
+    fill:#f00;
+}
+
+#lineInstantiateAttackMarker{
+    fill:#BF0000;
+}
+
+#perimeterArcMarker{
+    fill: #CC7A29;
 }
 
 .overlayedSVG{
-	position: absolute;
+    position: absolute;
 }
 
 .graph{
-   margin: 50px auto 0 auto;
-   border: 2px solid blue;
+    margin: 50px auto 0 auto;
+    border: 2px solid blue;
 }
 
 .node text {
-  pointer-events: none;
-  font: 10px sans-serif;
-  color: #000;
+    pointer-events: none;
+    font: 10px sans-serif;
+    color: #000;
 }
 
 .textPreview{
-  cursor: default;
-  font: 12px sans-serif;
-  fill: #fff;
+    cursor: default;
+    font: 12px sans-serif;
+    fill: #fff;
 }
 
 html, #map {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .arc path {
-  stroke: #fff;
+    stroke: #fff;
 }
 
 .arc text {
-  fill: #fff;
-  font: 13px sans-serif;
+    fill: #fff;
+    font: 13px sans-serif;
 }
 
 .textAttackID {
-  color: #fff;
-  position: absolute;
-  cursor: default;
+    color: #fff;
+    position: absolute;
+    cursor: default;
 }
 
 .sideMenu {
-	z-index: 1;
-	cursor: default;
+    z-index: 1;
+    cursor: default;
 }
 
 .bottomMenu {
-	z-index: 2;
-	white-space:nowrap;
-	overflow-x: scroll;
-	overflow-y: hidden;
+    z-index: 2;
+    white-space:nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
 }
 
 .bottomMenu .attackPreview {
-	z-index: 3;
-	display: inline-block;
-	background-color: #3d3d3d;
-	border: 2px solid white;
-	border-color: white;
+    z-index: 3;
+    display: inline-block;
+    background-color: #3d3d3d;
+    border: 2px solid white;
+    border-color: white;
 }
 
 .sideMenuLabel {
-	background-image:url(img/button_menu.png)
+    background-image:url(img/button_menu.png)
 }
 
 .bottomMenuLabel {
-	background-image:url(img/button_menu.png)
+    background-image:url(img/button_menu.png)
 }
 
 .tableAttack {
-      overflow-x: hidden !important;
-	  position: absolute;
-	  font: 13px sans-serif;
+    overflow-x: hidden !important;
+    position: absolute;
+    font: 13px sans-serif;
 }
 
 .attackPreview{
-	border-color: #00f;
+    border-color: #00f;
 }
 
 #responseText{
