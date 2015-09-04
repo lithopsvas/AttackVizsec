@@ -4,7 +4,7 @@
 <html>
 
     <head>
-        <meta name="viewport" content="initial-scale=0.7, user-scalable=no" />
+        <meta name="viewport" content="initial-scale=0.7, user-scalable=no, width=device-width" />
         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
         <script type="text/javascript" src="javascript/d3.v2.js"></script>
         <script type="text/javascript" src="javascript/d3.tip.v0.6.3.js"></script>
@@ -111,8 +111,8 @@
                     }
                 ]];
             map.setOptions({styles: styles[1]});
-//map.setOptions({scrollwheel: false});
-//redraw function on zoom
+
+            //redraw function on zoom
             google.maps.event.addListener(map, 'zoom_changed', function () {
 
 //                var lineStaticAttacks = d3.selectAll(".lineStaticAttack");
@@ -186,12 +186,13 @@
 
 // TODO: zoom for proactive mode
                 removeAllElements();
-                for (var i = 1; i < currentPreviewIndex; ++i)
-                    reactiveAlert(i, 0, 0);
+                for (var i = 0; i < currentPreviewIndex; ++i)
+                    reactiveAlert(i, 0);
                 setTimeout(function () {
-                    reactiveAlert(currentPreviewIndex, 300, 100);
+                    reactiveAlert(currentPreviewIndex, 300);
                 }, 1000);
             });
+
             var h = parseInt(window.innerHeight),
                     w = parseInt(window.innerWidth),
                     mode = 1, //0=proactive, 1=reactive
@@ -204,6 +205,8 @@
                     borderAttackPreview = 2,
                     totalEdges = [],
                     totalNode = [],
+                    totalAttacks = [],
+                    totalResponse = [],
                     alertNodes = [
                         "192.168.1.13",
                         "192.168.1.12",
@@ -226,8 +229,8 @@
                     projection = 0,
                     layer = 0,
                     numberOfPreviewAttack = 5,
-                    sideMenu = d3.select("body").append("div").attr("class", "sideMenu"),
-                    bottomMenuContainer = d3.select("body").append("div").attr("class", "bottomMenuContainer"),
+                    sideMenu,
+                    bottomMenuContainer,
                     wAttackPreview = (w - borderAttackPreview * (numberOfPreviewAttack * 2)) / numberOfPreviewAttack,
                     flagTable = 0,
                     flagClickedNode = 0, //0 not clicked, 1 clicked
@@ -239,29 +242,71 @@
                     wSVGPreview = wAttackPreview,
                     hPreviewHeaderDiv = 35,
                     likelihoodRank = [],
-                    idInstantiated = -1,
                     hSVGPreview = hBottomMenu - 30,
-                    json_file = "dati1.json";
-            var nodeRadius = 7;
-            var globalAttackEvolution = 0;
-            var totalAttacks = [];
-            var totalResponse = [];
-            var barWidth = "10px";
-            var bheight = d3.scale.linear().domain([0, 10]).range([0, 50]);
+                    nodeRadius = 7;
+
             document.getElementById('re').checked = true;
             // Load the station data. When the data comes back, create an overlay.
 
-            d3.json("dati1.json", function (source) {
-                overlay = new google.maps.OverlayView();
-                //create node list
-                createNodeList(source);
-                //we lock the position
-                totalNode.forEach(function (d) {
-                    d.fixed = true;
+            loadData();
+            initializeInterface();
+
+            function loadData() {
+                d3.json("network1.json", function (error, source) {
+                    if (error)
+                        return console.warn(error);
+                    //create node list
+                    createNodeList(source);
+
                 });
+                for (var index = 0; index <= 8; index++) {
+                    d3.json("response_plan/RP" + index + ".json", function (data)
+                    {
+                        totalResponse.push(data);
+                    });
+                    //update likelihood array
+                    d3.json("json attack/attack" + index + ".json", function (source) {
+                        totalAttacks.push(source);
+                        var o = {
+                            id: index,
+                            p: source.probability
+                        };
+                        if (likelihoodRank.length == 0) {
+                            likelihoodRank.push(o);
+                        }
+                        else {
+                            var i = 0;
+                            var position = -1;
+                            while (i < likelihoodRank.length) {
+                                var p = likelihoodRank[i].p;
+                                if (source.probability >= p) {
+                                    position = i;
+                                    break;
+                                }
+                                i++;
+                            }
+                            if (position == -1) {
+                                likelihoodRank.push(o);
+                            }
+                            else {
+                                likelihoodRank.splice(position, 0, o);
+                            }
+                        }
+                    });
+                }
+            }
+
+            function initializeInterface() {
+                createMap();
+                createSideMenu();
+                createBottomMenu();
+                removeElements();
+            }
+
+            function createMap() {
+                overlay = new google.maps.OverlayView();
                 // Add the container when the overlay is added to the map.
                 overlay.onAdd = function () {
-
                     //l'svg deve essere piÃ¹ grande dello schermo altrimenti taglia
                     //layer = d3.select(this.getPanes().overlayLayer)
                     layer = d3.select(this.getPanes().overlayMouseTarget)
@@ -291,10 +336,12 @@
                          .attr("xlink:href", "img/button_menu.png")
                          .attr('width', 25)
                          .attr('height', 25);*/
+
                         //group elements to manage alightment on links and nodes
                         //node are always in front of links
                         layer.append("g").attr("id", "links");
                         layer.append("g").attr("id", "nodes");
+                        layer.append("g").attr("id", "barriers");
                         //marker for arrows map
                         layer.append("svg:defs").append("svg:marker") // This section adds in the arrows
                                 .attr("id", "lineStaticAttackMarker")
@@ -377,17 +424,6 @@
                                 .attr("id", function (d) {
                                     return "edge" + replacePoints(d.source.name) + "-" + replacePoints(d.target.name);
                                 });
-                        /*var riotta=d3.select("#edge192p168p1p2-192p168p1p1");
-                         var l=riotta.node().getTotalLength();
-                         var p = riotta.node().getPointAtLength(1.0 * l);
-                         //console.log(p);
-                         layer.append("circle")
-                         .attr("class","barrier")
-                         .attr("cx",p.x)
-                         .attr("cy",p.y)
-                         .attr("r",10)
-                         .style("fill","red")*/
-
 
                         var nodes = layer.select("#nodes").selectAll(".node")
                                 .data(totalNode)
@@ -449,30 +485,25 @@
                         mm++;
                     };
                 };
-                createSideMenu(sideMenu);
-                createBottomMenu(bottomMenuContainer);
-                //donut chart
-
                 // Bind our overlay to the map
                 overlay.setMap(map);
-                removeElements();
-                drawDonutChart();
-                drawResponsePlanPreview();
-            });
-            function drawPreviews() {
+            }
 
+            function drawPreviews() {
+                drawDonutChart();
+                drawButtons();
                 //var time = 3000;
                 if (mode == 0)
                 {
                     var time = 0;
-                    for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
+                    for (var indexOfPreview = 0; indexOfPreview < 9; indexOfPreview++) {
                         var myVar = setTimeout("drawPreview(" + indexOfPreview + ")", time);
                         time = time + 100;
                     }
                 }
                 else
                 {
-                    for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
+                    for (var indexOfPreview = 0; indexOfPreview < 9; indexOfPreview++) {
                         drawPreview(indexOfPreview);
                     }
                 }
@@ -505,7 +536,11 @@
 
                 clearProbableAttack();
             }
-
+            /**
+             * Inits totalNode, totalEdges, subnetList
+             * @@param source
+             * @returns {undefined}
+             */
             function createNodeList(source) {
                 var i = 0;
                 source.children.forEach(function (d) {
@@ -544,7 +579,8 @@
                         patchValue: patch, // dovrebbe essere patch/size
                         critValue: crit, // dovrebbe essere crit/size
                         x: xlat,
-                        y: ylong
+                        y: ylong,
+                        fixed: true //we lock the position
                     });
                     totalNode.forEach(function (d) {
 
@@ -574,8 +610,9 @@
                 return false;
             }
 
-            function createSideMenu(sideMenu) {
-                sideMenu.style("height", h + "px")
+            function createSideMenu() {
+                sideMenu = d3.select("body").append("div").attr("class", "sideMenu")
+                        .style("height", h + "px")
                         .style("width", wSideMenu + "px")
                         .style("position", "absolute")
                         .style("top", "0px")
@@ -596,11 +633,39 @@
                             }
                         })
                         .style("background-color", "#3d3d3d");
+                var div = sideMenu.append("div")
+                        .attr("id", "donutChartDiv")
+                        .style("position", "relative")
+                        .style("height", height)
+                        .style("width", width)
+                        .style("background-color", "#3d3d3d");
+                div.append("svg")
+                        .attr("id", "donutChart")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .append("g")
+                        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                sideMenu.append("div")
+                        .attr("class", "tableAttack")
+                        .style("left", (wSideMenu / 3 - (radius / 8)) + "px")
+                        .style("top", height * 0.4 / 2 + "px")
+                        .style("width", 5 * radius / 8 + "px") //radius/2 for rect lenght + radius/8 for shifting when mouseover on arc
+                        .style("height", height * 0.6 + "px")
+                        .style("max-height", height * 0.6 + "px");
+                sideMenu.append("div")
+                        .attr("id", "buttonsDiv")
+                        .style("position", "relative")
+                        .style("width", width)
+                        .style("text-align", "center")
+                        .style("background-color", "#3d3d3d");
+
+                drawResponsePlanPreview();
             }
 
             //creates bottom menu and associates for each div a svg
-            function createBottomMenu(bottomMenuContainer) {
-                bottomMenuContainer
+            function createBottomMenu() {
+                bottomMenuContainer = d3.select("body").append("div")
+                        .attr("class", "bottomMenuContainer")
                         .style("height", hBottomMenu + "px")
                         .style("width", w - wSideMenu + "px")
                         .style("max-width", w - wSideMenu + "px")
@@ -629,122 +694,91 @@
                         .attr("align", "left");
             }
 
-            function drawPreviewGraph(index, svg, json) {
+            function drawPreviewGraph(index, svg) {
                 var graphAttack = [];
-                d3.json(json, function (source) {
-                    source.attack.forEach(function (d) {
-                        var nodeS = d.source.name,
-                                nodeT = d.target.name;
-                        totalNode.forEach(function (e) {
-                            if (e.name == nodeS)
-                                nodeS = e;
-                            if (e.name == nodeT)
-                                nodeT = e;
-                        });
-                        //console.log(nodeS)
-                        graphAttack.push({
-                            s: nodeS,
-                            t: nodeT
-                        });
+                totalAttacks[index].attack.forEach(function (d) {
+                    var nodeS = d.source.name,
+                            nodeT = d.target.name;
+                    totalNode.forEach(function (e) {
+                        if (e.name == nodeS)
+                            nodeS = e;
+                        if (e.name == nodeT)
+                            nodeT = e;
                     });
-                    graphAttack.pop();
-                    drawPreviewArcs(svg, graphAttack);
-                    //animationArcs(svg,graphAttack);
-                    drawPreviewNodes(svg, graphAttack);
-                    var attackPreviewHeader = d3.select("#attackPreviewHeader_" + index);
-                    attackPreviewHeader.append("text")
-                            .attr("class", "textAttackID")
-                            .text("Attack ID: " + index)
-                            .style("position", "absolute")
-                            .style("left", "10px")
-                            .style("top", "15px");
-
-                    attackPreviewHeader.append("button")
-                            .style("width", "75px")
-                            .style("height", "25px")
-                            .style("position", "absolute")
-                            .style("right", "10px")
-                            .style("top", "10px")
-                            .html("Inspect")
-                            .on("click", function () {
-                                svg.selectAll(".linePreviewAttack").remove();
-                                animationArcs(svg, graphAttack);
-                                //d3.event.stopPropagation();
-                            });
-                    //legend
-                    var g = svg.append("g")
-                            .attr("transform", "translate(" + (wSVGPreview - 75) + "," + (hPreviewHeaderDiv + 20) + ")");
-                    g.append("text")
-                            .attr("class", "textPreview")
-                            .text("Length: " + graphAttack.length);
-                    g.append("text")
-                            .attr("transform", "translate(0," + 20 + ")")
-                            .attr("class", "textPreview")
-                            .text("Legend:");
-                    var g1 = g.append("g")
-                            .attr("transform", "translate(0," + 40 + ")");
-                    g1.append("text")
-                            .attr("class", "textPreview")
-                            .text("Source:");
-                    g1.append("rect")
-                            .attr("width", 10)
-                            .attr("height", 10)
-                            .style("fill", "white")
-                            .attr("transform", function (d) {
-                                return "translate(50,-10)";
-                            });
-                    g1.append("circle")
-                            .attr("r", 2)
-                            .attr("cx", 55)
-                            .attr("cy", -5)
-                            .style("fill", "black");
-                    var g2 = g.append("g")
-                            .attr("transform", "translate(0," + 60 + ")");
-                    g2.append("text")
-                            .attr("class", "textPreview")
-                            .text("Target:");
-                    g2.append("rect")
-                            .attr("width", 10)
-                            .attr("height", 10)
-                            .style("fill", "white")
-                            .attr("transform", function (d) {
-                                return "translate(55,-10)rotate(45)";
-                            });
-                    g2.append("circle")
-                            .attr("r", 2)
-                            .attr("cx", 55)
-                            .attr("cy", -2.5)
-                            .style("fill", "black");
-                    d3.json("response_plan/RP" + index + ".json", function (data)
-                    {
-                        totalResponse[index - 1] = data;
-                        var rptext = "<b>Response Plan</b> ID" + index + "<br><br>";
-                        //console.log(data);
-                        //console.log(data["response-plan"].length);
-                        for (k = 0; k < data["response-plan"].length; k++)
-                        {
-                            //console.log(k);
-                            nodetext = data["response-plan"][k].mitigation;
-                            rptext = rptext + "<b>Action: </b>" + nodetext.name + " <b>Node: </b>" + nodetext.edge.target + "<br>";
-                        }
-                        //console.log(rptext);
-
-                        //d3.select("#responseText")
-                        //  .html(rptext);
+                    //console.log(nodeS)
+                    graphAttack.push({
+                        s: nodeS,
+                        t: nodeT
                     });
-                    /* g.append("text")
-                     .attr("cursor","default")
-                     .attr("dy", 20)
-                     .style("text-anchor", "middle")
-                     .attr("dx", 35)
-                     .text(graphAttack.length)
-                     .on("click", function(){
-                     svg.selectAll(".linePreviewAttack").remove();
-                     //var previewGraphAttack=svg.selectAll("#previewNodes");
-                     animationArcs(svg,graphAttack);
-                     d3.event.stopPropagation();
-                     });*/
                 });
+                graphAttack.pop();
+                drawPreviewArcs(svg, graphAttack);
+                //animationArcs(svg,graphAttack);
+                drawPreviewNodes(svg, graphAttack);
+                var attackPreviewHeader = d3.select("#attackPreviewHeader_" + index);
+                attackPreviewHeader.append("text")
+                        .attr("class", "textAttackID")
+                        .text("Attack ID: " + index)
+                        .style("position", "absolute")
+                        .style("left", "10px")
+                        .style("top", "15px");
+
+                attackPreviewHeader.append("button")
+                        .style("width", "75px")
+                        .style("height", "25px")
+                        .style("position", "absolute")
+                        .style("right", "10px")
+                        .style("top", "10px")
+                        .html("Inspect")
+                        .on("click", function () {
+                            svg.selectAll(".linePreviewAttack").remove();
+                            animationArcs(svg, graphAttack);
+                            //d3.event.stopPropagation();
+                        });
+                //legend
+                var g = svg.append("g")
+                        .attr("transform", "translate(" + (wSVGPreview - 75) + "," + (hPreviewHeaderDiv + 20) + ")");
+                g.append("text")
+                        .attr("class", "textPreview")
+                        .text("Length: " + graphAttack.length);
+                g.append("text")
+                        .attr("transform", "translate(0," + 20 + ")")
+                        .attr("class", "textPreview")
+                        .text("Legend:");
+                var g1 = g.append("g")
+                        .attr("transform", "translate(0," + 40 + ")");
+                g1.append("text")
+                        .attr("class", "textPreview")
+                        .text("Source:");
+                g1.append("rect")
+                        .attr("width", 10)
+                        .attr("height", 10)
+                        .style("fill", "white")
+                        .attr("transform", function (d) {
+                            return "translate(50,-10)";
+                        });
+                g1.append("circle")
+                        .attr("r", 2)
+                        .attr("cx", 55)
+                        .attr("cy", -5)
+                        .style("fill", "black");
+                var g2 = g.append("g")
+                        .attr("transform", "translate(0," + 60 + ")");
+                g2.append("text")
+                        .attr("class", "textPreview")
+                        .text("Target:");
+                g2.append("rect")
+                        .attr("width", 10)
+                        .attr("height", 10)
+                        .style("fill", "white")
+                        .attr("transform", function (d) {
+                            return "translate(55,-10)rotate(45)";
+                        });
+                g2.append("circle")
+                        .attr("r", 2)
+                        .attr("cx", 55)
+                        .attr("cy", -2.5)
+                        .style("fill", "black");
             }
 
             function drawPreviewArcs(svgPreview, list) {
@@ -958,7 +992,7 @@
                 return pySVG;
             }
 
-            function createChart(json, x) {
+            function createChart(x) {
                 var index = 0, i = 0;
                 var graphAttack = [], lines = [], tableAttack = d3.select(".tableAttack");
                 //draw graph attacck and donut chart
@@ -966,174 +1000,171 @@
 
                 flagTable = 1;
                 //draw donut and graph attack
-                d3.json(json, function (source) {
-                    var yOffset = 0;
-                    var i = 0;
-                    var svgTable = d3.select("#svgTable_" + x);
-                    if (svgTable[0][0] == null) {
+                var yOffset = 0;
+                var i = 0;
+                var svgTable = d3.select("#svgTable_" + x);
+                if (svgTable[0][0] == null) {
+                    var svgTable = tableAttack.append("svg")
+                            .attr("id", "svgTable_" + x)
+                            .attr("width", tableAttack.style("width"))
+                            .attr("height", (parseInt(radius * 0.1) + 1) * totalAttacks[x].attack.length);
+                }
 
-                        var svgTable = tableAttack.append("svg")
-                                .attr("id", "svgTable_" + x)
-                                .attr("width", tableAttack.style("width"))
-                                .attr("height", (parseInt(radius * 0.1) + 1) * source.attack.length);
-                    }
-
-                    source.attack.forEach(function (d) {
-                        var s_attack = source.attack[i++];
-                        var g1 = svgTable.append("g")
-                                .attr("transform", "translate(" + radius / 8 + "," + yOffset + ")")
-                                .attr("id", "idGTable" + getSubnet(s_attack.source.name).replace(/\./g, "_")) //id will be #idGTable192_168_1
-                                .on("mouseover", function () {
-                                    var node = d3.selectAll(".node").filter(function (e) {
-                                        return e.name == s_attack.source.name;
-                                    });
-                                    node.select("circle")
-                                            .transition()
-                                            .duration(1000)
-                                            .attr("r", 9)
+                totalAttacks[x].attack.forEach(function (d) {
+                    var s_attack = totalAttacks[x].attack[i++];
+                    var g1 = svgTable.append("g")
+                            .attr("transform", "translate(" + radius / 8 + "," + yOffset + ")")
+                            .attr("id", "idGTable" + getSubnet(s_attack.source.name).replace(/\./g, "_")) //id will be #idGTable192_168_1
+                            .on("mouseover", function () {
+                                var node = d3.selectAll(".node").filter(function (e) {
+                                    return e.name == s_attack.source.name;
+                                });
+                                node.select("circle")
+                                        .transition()
+                                        .duration(1000)
+                                        .attr("r", 9)
+                                        .attr("stroke", "#ff0")
+                                        .style("fill", "#ff0")
+                                        .each("end", function () {
+                                            node.select("circle").transition()
+                                                    .duration(500)
+                                                    .attr("r", 9)
+                                                    .attr("stroke", "#ff0")
+                                                    .style("fill", "#3d3d3d")
+                                                    .attr("stroke-width", "2px");
+                                        });
+                                //animation for normal nodes
+                                d3.select(".bottomMenu").selectAll("#previewNodes").filter(function (d) {
+                                    return d.name == s_attack.source.name;
+                                })
+                                        .transition()
+                                        .duration(1000)
+                                        .attr("r", 5)
+                                        .style("fill", "yellow")
+                                        .each("end", function () {
+                                            d3.select(this)
+                                                    .transition()
+                                                    .duration(1000)
+                                                    .attr("r", 3);
+                                        });
+                                //animation for source and target nodes
+                                d3.select(".bottomMenu").selectAll("#previewNodesST").filter(function (d) {
+                                    return d.name == s_attack.source.name;
+                                })
+                                        .transition()
+                                        .duration(1000)
+                                        .attr("r", 7)
+                                        .style("fill", "yellow")
+                                        .each("end", function () {
+                                            d3.select(this)
+                                                    .transition()
+                                                    .duration(1000)
+                                                    .attr("r", 5);
+                                        });
+                            })
+                            .on("mouseout", function () {
+                                var node = d3.selectAll(".node").filter(function (e) {
+                                    return e.name == s_attack.source.name;
+                                });
+                                node.select("circle")
+                                        .transition()
+                                        .duration(500)
+                                        .attr("r", 7)
+                                        .style("fill", "#3d3d3d")
+                                        .attr("stroke-width", "0px");
+                                //set back normal nodes
+                                d3.select(".bottomMenu").selectAll("#previewNodes").filter(function (d) {
+                                    return d.name == s_attack.source.name;
+                                })
+                                        .transition()
+                                        .duration(1000)
+                                        .attr("r", 3)
+                                        .style("fill", "white");
+                                //set back source and target nodes
+                                d3.select(".bottomMenu").selectAll("#previewNodesST").filter(function (d) {
+                                    return d.name == s_attack.source.name;
+                                })
+                                        .transition()
+                                        .duration(1000)
+                                        .attr("r", 5)
+                                        .style("fill", "white");
+                            })
+                            .on("click", function () {
+                                var previousArcs = true;
+                                var id = d3.select(d3.select(this).node().parentNode).attr("id").match(/[0-9]+/)[0];
+                                //arcs
+                                var remainAttackArcs = d3.selectAll(".lineStaticAttack");
+                                //this one shows only the outgoing arcs
+                                /*  var outgoingAttackArcs = d3.selectAll(".lineStaticAttack").filter( function(d){ //outgoing arcs
+                                 return d.source.name == s_attack.source.name;
+                                 }); */
+                                //this one shows the previous arcs too
+                                var outgoingAttackArcs = d3.selectAll("#lineStaticAttack" + id).filter(function (d) { //outgoing arcs
+                                    if (d.source.name == s_attack.source.name) {
+                                        previousArcs = false;
+                                        return true;
+                                    }
+                                    return (d.source.name != s_attack.source.name) && previousArcs;
+                                });
+                                //instantiate
+                                var remainInstantiateAttackArcs = d3.selectAll(".lineInstantiateAttack");
+                                var outgoingInstantiateAttackArcs = d3.selectAll("#lineInstantiateAttack" + id).filter(function (d) { //outgoing arcs
+                                    if (d.source.name == s_attack.source.name) {
+                                        previousArcs = false;
+                                        return true;
+                                    }
+                                    return (d.source.name != s_attack.source.name) && previousArcs;
+                                });
+                                //iinks
+                                var remainLinks = d3.selectAll(".line");
+                                var outgoingLinks = d3.selectAll(".line").filter(function (d) { //outgoing arcs
+                                    return (d.source.name == s_attack.source.name) || (d.target.name == s_attack.source.name);
+                                });
+                                if (lastClickedNode != s_attack.source.name || flagClickedNode == 0) {
+                                    remainAttackArcs.transition().duration(1000).style("opacity", 0);
+                                    remainInstantiateAttackArcs.transition().duration(1000).style("opacity", 0);
+                                    outgoingAttackArcs.transition().duration(1000).style("opacity", 1);
+                                    outgoingInstantiateAttackArcs.transition().duration(1000).style("opacity", 1);
+                                    remainLinks.transition().duration(1000).style("opacity", 0);
+                                    outgoingLinks.transition().duration(1000).style("opacity", 1);
+                                    //restore the border of the other cells
+                                    d3.select(".tableAttack").selectAll("rect").attr("stroke-width", "0px");
+                                    //color the border of the cell
+                                    var rect = g1.select("rect")
                                             .attr("stroke", "#ff0")
-                                            .style("fill", "#ff0")
-                                            .each("end", function () {
-                                                node.select("circle").transition()
-                                                        .duration(500)
-                                                        .attr("r", 9)
-                                                        .attr("stroke", "#ff0")
-                                                        .style("fill", "#3d3d3d")
-                                                        .attr("stroke-width", "2px");
-                                            });
-                                    //animation for normal nodes
-                                    d3.select(".bottomMenu").selectAll("#previewNodes").filter(function (d) {
-                                        return d.name == s_attack.source.name;
-                                    })
-                                            .transition()
-                                            .duration(1000)
-                                            .attr("r", 5)
-                                            .style("fill", "yellow")
-                                            .each("end", function () {
-                                                d3.select(this)
-                                                        .transition()
-                                                        .duration(1000)
-                                                        .attr("r", 3);
-                                            });
-                                    //animation for source and target nodes
-                                    d3.select(".bottomMenu").selectAll("#previewNodesST").filter(function (d) {
-                                        return d.name == s_attack.source.name;
-                                    })
-                                            .transition()
-                                            .duration(1000)
-                                            .attr("r", 7)
-                                            .style("fill", "yellow")
-                                            .each("end", function () {
-                                                d3.select(this)
-                                                        .transition()
-                                                        .duration(1000)
-                                                        .attr("r", 5);
-                                            });
-                                })
-                                .on("mouseout", function () {
-                                    var node = d3.selectAll(".node").filter(function (e) {
-                                        return e.name == s_attack.source.name;
-                                    });
-                                    node.select("circle")
-                                            .transition()
-                                            .duration(500)
-                                            .attr("r", 7)
-                                            .style("fill", "#3d3d3d")
+                                            .attr("stroke-width", "1px");
+                                    //set the flag
+                                    flagClickedNode = 1;
+                                }
+                                else {
+                                    //if the node is pressed
+                                    outgoingLinks.transition().duration(1000).style("opacity", 0.2);
+                                    remainLinks.transition().duration(1000).style("opacity", 0.2);
+                                    remainAttackArcs.transition().duration(1000).style("opacity", 1);
+                                    remainInstantiateAttackArcs.transition().duration(1000).style("opacity", 1);
+                                    //color the border of the cell
+                                    var rect = g1.select("rect")
                                             .attr("stroke-width", "0px");
-                                    //set back normal nodes
-                                    d3.select(".bottomMenu").selectAll("#previewNodes").filter(function (d) {
-                                        return d.name == s_attack.source.name;
-                                    })
-                                            .transition()
-                                            .duration(1000)
-                                            .attr("r", 3)
-                                            .style("fill", "white");
-                                    //set back source and target nodes
-                                    d3.select(".bottomMenu").selectAll("#previewNodesST").filter(function (d) {
-                                        return d.name == s_attack.source.name;
-                                    })
-                                            .transition()
-                                            .duration(1000)
-                                            .attr("r", 5)
-                                            .style("fill", "white");
-                                })
-                                .on("click", function () {
-                                    var previousArcs = true;
-                                    var id = d3.select(d3.select(this).node().parentNode).attr("id").match(/[0-9]+/)[0];
-                                    //arcs
-                                    var remainAttackArcs = d3.selectAll(".lineStaticAttack");
-                                    //this one shows only the outgoing arcs
-                                    /*  var outgoingAttackArcs = d3.selectAll(".lineStaticAttack").filter( function(d){ //outgoing arcs
-                                     return d.source.name == s_attack.source.name;
-                                     }); */
-                                    //this one shows the previous arcs too
-                                    var outgoingAttackArcs = d3.selectAll("#lineStaticAttack" + id).filter(function (d) { //outgoing arcs
-                                        if (d.source.name == s_attack.source.name) {
-                                            previousArcs = false;
-                                            return true;
-                                        }
-                                        return (d.source.name != s_attack.source.name) && previousArcs;
-                                    });
-                                    //instantiate
-                                    var remainInstantiateAttackArcs = d3.selectAll(".lineInstantiateAttack");
-                                    var outgoingInstantiateAttackArcs = d3.selectAll("#lineInstantiateAttack" + id).filter(function (d) { //outgoing arcs
-                                        if (d.source.name == s_attack.source.name) {
-                                            previousArcs = false;
-                                            return true;
-                                        }
-                                        return (d.source.name != s_attack.source.name) && previousArcs;
-                                    });
-                                    //iinks
-                                    var remainLinks = d3.selectAll(".line");
-                                    var outgoingLinks = d3.selectAll(".line").filter(function (d) { //outgoing arcs
-                                        return (d.source.name == s_attack.source.name) || (d.target.name == s_attack.source.name);
-                                    });
-                                    if (lastClickedNode != s_attack.source.name || flagClickedNode == 0) {
-                                        remainAttackArcs.transition().duration(1000).style("opacity", 0);
-                                        remainInstantiateAttackArcs.transition().duration(1000).style("opacity", 0);
-                                        outgoingAttackArcs.transition().duration(1000).style("opacity", 1);
-                                        outgoingInstantiateAttackArcs.transition().duration(1000).style("opacity", 1);
-                                        remainLinks.transition().duration(1000).style("opacity", 0);
-                                        outgoingLinks.transition().duration(1000).style("opacity", 1);
-                                        //restore the border of the other cells
-                                        d3.select(".tableAttack").selectAll("rect").attr("stroke-width", "0px");
-                                        //color the border of the cell
-                                        var rect = g1.select("rect")
-                                                .attr("stroke", "#ff0")
-                                                .attr("stroke-width", "1px");
-                                        //set the flag
-                                        flagClickedNode = 1;
-                                    }
-                                    else {
-                                        //if the node is pressed
-                                        outgoingLinks.transition().duration(1000).style("opacity", 0.2);
-                                        remainLinks.transition().duration(1000).style("opacity", 0.2);
-                                        remainAttackArcs.transition().duration(1000).style("opacity", 1);
-                                        remainInstantiateAttackArcs.transition().duration(1000).style("opacity", 1);
-                                        //color the border of the cell
-                                        var rect = g1.select("rect")
-                                                .attr("stroke-width", "0px");
-                                        //set the flag
-                                        flagClickedNode = 0;
-                                    }
-                                    lastClickedNode = s_attack.source.name;
-                                });
-                        g1.append("rect")
-                                .attr("width", radius / 2 + "px")
-                                .attr("height", radius * 0.1 + "px")
-                                .attr("fill", function () {
-                                    return color(getSubnet(s_attack.source.name));
-                                });
-                        g1.append("text")
-                                .attr("dy", radius * 0.1 / 1.5)
-                                .style("text-anchor", "middle")
-                                .attr("dx", radius / 4)
-                                .text(function () {
-                                    return s_attack.source.name;
-                                });
-                        yOffset += parseInt(radius * 0.1) + 1;
-                        graphAttack.push(s_attack.source.name);
-                    });
+                                    //set the flag
+                                    flagClickedNode = 0;
+                                }
+                                lastClickedNode = s_attack.source.name;
+                            });
+                    g1.append("rect")
+                            .attr("width", radius / 2 + "px")
+                            .attr("height", radius * 0.1 + "px")
+                            .attr("fill", function () {
+                                return color(getSubnet(s_attack.source.name));
+                            });
+                    g1.append("text")
+                            .attr("dy", radius * 0.1 / 1.5)
+                            .style("text-anchor", "middle")
+                            .attr("dx", radius / 4)
+                            .text(function () {
+                                return s_attack.source.name;
+                            });
+                    yOffset += parseInt(radius * 0.1) + 1;
+                    graphAttack.push(s_attack.source.name);
                 });
             }
 
@@ -1160,6 +1191,7 @@
                         break;
                     case 3:
                         id = "perimeterArc";
+                        radiusMagnifier = 0;
                         break;
                 }
                 var lines = {
@@ -1168,50 +1200,45 @@
                     radiusMagnifier: radiusMagnifier
                 };
                 if (type == 0) {
-                    d3.json("json attack/attack" + attackIndex + ".json", function (source) {
-                        source.attack.forEach(function (attackEdge) {
-                            totalNode.forEach(function (sourceNode) {
-                                if (sourceNode.name == attackEdge.source.name) {
-                                    totalNode.forEach(function (targetNode) {
-                                        if (targetNode.name == attackEdge.target.name)
-                                            lines.edges.push({
-                                                source: sourceNode,
-                                                target: targetNode,
-                                                edgeId: id + attackIndex,
-                                                strokeWidth: stroke
-                                            });
-                                    });
-                                }
-                            });
+                    totalAttacks[attackIndex].attack.forEach(function (attackEdge) {
+                        totalNode.forEach(function (sourceNode) {
+                            if (sourceNode.name == attackEdge.source.name) {
+                                totalNode.forEach(function (targetNode) {
+                                    if (targetNode.name == attackEdge.target.name)
+                                        lines.edges.push({
+                                            source: sourceNode,
+                                            target: targetNode,
+                                            edgeId: id + attackIndex,
+                                            strokeWidth: stroke
+                                        });
+                                });
+                            }
                         });
-                        drawGraph(lines);
                     });
+                    drawGraph(lines);
                 }
                 else if (type == 1) {
-                    //TODO: delete json call every time change it to totalAttacks
-                    d3.json("json attack/attack" + attackIndex + ".json", function (source) {
-                        source.attack.forEach(function (attackEdge) {
-                            totalNode.forEach(function (sourceNode) {
-                                if (sourceNode.name == attackEdge.source.name) {
-                                    totalNode.forEach(function (targetNode) {
-                                        if (targetNode.name == attackEdge.target.name)
-                                            lines.edges.push({
-                                                source: sourceNode,
-                                                target: targetNode,
-                                                edgeId: id + attackIndex,
-                                                strokeWidth: strokeScale(source.probability)
-                                            });
-                                    });
-                                }
-                            });
+                    totalAttacks[attackIndex].attack.forEach(function (attackEdge) {
+                        totalNode.forEach(function (sourceNode) {
+                            if (sourceNode.name == attackEdge.source.name) {
+                                totalNode.forEach(function (targetNode) {
+                                    if (targetNode.name == attackEdge.target.name)
+                                        lines.edges.push({
+                                            source: sourceNode,
+                                            target: targetNode,
+                                            edgeId: id + attackIndex,
+                                            strokeWidth: strokeScale(totalAttacks[attackIndex].probability)
+                                        });
+                                });
+                            }
                         });
-                        drawGraph(lines);
                     });
+                    drawGraph(lines);
                 }
                 else if (type == 2) {
                     //draw lineInstantiateAttack lines on the base on alertNodes
                     d3.selectAll(".lineInstantiateAttack").remove();
-                    var alertedNodesList = alertNodes.slice(0, currentPreviewIndex);
+                    var alertedNodesList = alertNodes.slice(0, currentPreviewIndex + 1);
                     if (alertedNodesList.length > 1) {
                         for (var index = 0; index < (alertedNodesList.length - 1); index++) {
                             var sourceNode;
@@ -1233,14 +1260,17 @@
                     }
                 }
                 else if (type == 3) {
+
                     d3.selectAll(".perimeterArc").remove();
                     d3.selectAll(".line").style("opacity", 0.1);
-                    var activeNode = alertNodes[attackIndex - 1];
+                    var activeNode = alertNodes[attackIndex];
                     var barriers = [];
                     //Active attack predicted edges which are then covered by barriers  
                     var maxAttacksPerEdge = 0;
+
                     for (var h = 0; h < totalAttacks.length; h++)//for all attacs
                     {
+
                         for (var k = 0; k < totalAttacks[h].attack.length; k++)//for each attack path in attack
                         {
                             outerloop:
@@ -1305,6 +1335,7 @@
                 //var ap = getAttackArray(lines);  //contains the attack path in the form of an array of nodes
             }
 
+
             /**
              * Draws graph lines
              * @param {type} lines
@@ -1344,6 +1375,19 @@
                         })
                         .attr("marker-end", "url(#" + lines.class + "Marker)");
             }
+
+            function computeBarrier(index, s, t)
+            {
+                var result = [];
+                var activeResponse = totalResponse[index]["response-plan"];
+                for (k = 0; k < activeResponse.length; k++)
+                {
+                    if ((activeResponse[k].mitigation.edge.source === s) && (activeResponse[k].mitigation.edge.target === t))
+                        result.push(activeResponse[k]);
+                }
+                return result;
+            }
+
             /**
              * Transform oject of nodes into array on IP adresses
              * @param {type} arlines
@@ -1428,77 +1472,10 @@
                             return d.size;
                         });
 
-                var div = sideMenu.append("div")
-                        .attr("id", "donutChartDiv")
-                        .style("position", "relative")
-                        .style("height", height)
-                        .style("width", width)
-                        .style("background-color", "#3d3d3d");
-                var svg = div.append("svg")
-                        .attr("id", "donutChart")
-                        .attr("width", width)
-                        .attr("height", height)
-                        .append("g")
-                        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-                var tableAttack = sideMenu.append("div")
-                        .attr("class", "tableAttack")
-                        .style("left", (wSideMenu / 3 - (radius / 8)) + "px")
-                        .style("top", height * 0.4 / 2 + "px")
-                        .style("width", 5 * radius / 8 + "px") //radius/2 for rect lenght + radius/8 for shifting when mouseover on arc
-                        .style("height", height * 0.6 + "px")
-                        .style("max-height", height * 0.6 + "px");
-                var divButtons = sideMenu.append("div")
-                        .attr("id", "buttonsDiv")
-                        .style("position", "relative")
-                        .style("width", width)
-                        .style("text-align", "center")
-                        .style("background-color", "#3d3d3d");
-                divButtons.append("button")
-                        .style("width", 75 + "px")
-                        .style("height", 25 + "px")
-                        .text("Play one")
-                        .on("click", function () {
-                            if (currentPreviewIndex == 0) {
-                                removeAllElements();
-                            }
-                            else {
-                                reactiveAlert(currentPreviewIndex, 500, 200);
-                            }
-                            currentPreviewIndex++;
-                            if (currentPreviewIndex >= 10) {
-                                currentPreviewIndex = 0;
-                                d3.select(this).text("Clear");
-                            }
-                            else
-                                d3.select(this).text("Play " + currentPreviewIndex);
-                        });
-                divButtons.append("button")
-                        .style("width", 75 + "px")
-                        .style("height", 25 + "px")
-                        .text("Play all")
-                        .on("click", function () {
-                            currentPreviewIndex = 1;
-                            removeAllElements();
-                            var tt = 1000;
-                            for (var indexOfPreview = 1; indexOfPreview < 10; indexOfPreview++) {
-                                setTimeout(function () {
-                                    reactiveAlert(currentPreviewIndex, 500, 200);
-                                    currentPreviewIndex++;
-                                }, tt);
-                                tt = tt + 5000;
-                            }
-                        });
-                divButtons.append("button")
-                        .style("width", 75 + "px")
-                        .style("height", 25 + "px")
-                        .text("Reset")
-                        .on("click", function () {
-                            //location.reload();
-                            removeAllElements();
-                        });
 
-
-
+                var div = d3.select("#donutChartDiv");
+                var svg = d3.select("#donutChart").select("g");
+                var tableAttack = d3.select(".tableAttack");
                 var g = svg.selectAll(".arc")
                         .data(pie(subnetList))
                         .enter().append("g")
@@ -1654,6 +1631,55 @@
                         });
             }
 
+            function drawButtons() {
+
+                var divButtons = d3.select("#buttonsDiv");
+                divButtons.append("button")
+                        .style("width", 80 + "px")
+                        .style("height", 25 + "px")
+                        .text("Play 1")
+                        .on("click", function () {
+                            if (currentPreviewIndex == -1) {
+                                removeAllElements();
+                            }
+                            else {
+                                reactiveAlert(currentPreviewIndex, 1000);
+                            }
+                            currentPreviewIndex++;
+                            if (currentPreviewIndex >= 9) {
+                                currentPreviewIndex = -1;
+                                d3.select(this).text("Clear");
+                            }
+                            else
+                                d3.select(this).text("Play " + currentPreviewIndex);
+                        });
+                divButtons.append("button")
+                        .style("width", 80 + "px")
+                        .style("height", 25 + "px")
+                        .text("Play all")
+                        .on("click", function () {
+                            currentPreviewIndex = 0;
+                            removeAllElements();
+                            var tt = 1000;
+                            for (var indexOfPreview = 0; indexOfPreview < 8; indexOfPreview++) {
+                                setTimeout(function () {
+                                    reactiveAlert(currentPreviewIndex, 3000);
+                                    currentPreviewIndex++;
+                                }, tt);
+                                tt = tt + 5000;
+                            }
+                        });
+                divButtons.append("button")
+                        .style("width", 80 + "px")
+                        .style("height", 25 + "px")
+                        .text("Reset")
+                        .on("click", function () {
+                            //location.reload();
+                            removeAllElements();
+                        });
+
+            }
+
             function drawResponsePlanPreview() {
                 var filterArray = [1, 1, 1];
                 var divResponsePlan = sideMenu.append("div")
@@ -1718,30 +1744,26 @@
                 var detailsHeaderSummary = barrierDetailsHeader.append("div")
                         .attr("id", "barrierDetailsHeaderBarrierSummary")
                         .style("height", "100%")
-                        .style("width", "70%")
+                        .style("width", "100%")
                         .attr("align", "center")
-                        .style("display", "table-cell")
-                        .style("vertical-align", "middle");
-
+                        .style("position", "relative")
+                        .style("top", "0");
 
                 var div = detailsHeaderSummary.append("div")
-                        .style("height", "20%")
-                        .style("margin", "10% 0%")
+                        .style("height", "33%")
+                        .style("position", "relative")
                         .append("div")
                         .style("width", "80%")
-                        .style("height", "100%")
+                        .style("height", "65%")
                         .style("display", "table")
+                        .style("position", "relative")
+                        .style("top", "50%")
+                        .style("transform", "translateY(-50%)")
                         .style("border-radius", "5px")
                         .style("border-style", "solid")
                         .style("border-width", "2px")
                         .style("border-color", "white")
-                        .style("background-color", "red")
-                        .on("mouseover", function () {
-                            filterBarrierDetailsBody([1, 0, 0]);
-                        })
-                        .on("mouseout", function () {
-                            filterBarrierDetailsBody(filterArray);
-                        });
+                        .style("background-color", "red");
 
                 div.append("div")
                         .style("width", "30%")
@@ -1770,26 +1792,28 @@
                         .property("disabled", true)
                         .on("change", function () {
                             filterArray[0] = this.checked;
-                        });
-//               ----------------------- 
-                var div = detailsHeaderSummary.append("div")
-                        .style("height", "20%")
-                        .style("margin", "10% 0%")
-                        .append("div")
-                        .style("width", "80%")
-                        .style("height", "100%")
-                        .style("display", "table")
-                        .style("border-radius", "5px")
-                        .style("border-style", "solid")
-                        .style("border-width", "2px")
-                        .style("border-color", "white")
-                        .style("background-color", "green")
+                        })
                         .on("mouseover", function () {
-                            filterBarrierDetailsBody([0, 1, 0]);
+                            filterBarrierDetailsBody([1, 0, 0]);
                         })
                         .on("mouseout", function () {
                             filterBarrierDetailsBody(filterArray);
                         });
+//               ----------------------- 
+                var div = detailsHeaderSummary.append("div")
+                        .style("height", "33%")
+                        .append("div")
+                        .style("width", "80%")
+                        .style("height", "65%")
+                        .style("display", "table")
+                        .style("position", "relative")
+                        .style("top", "50%")
+                        .style("transform", "translateY(-50%)")
+                        .style("border-radius", "5px")
+                        .style("border-style", "solid")
+                        .style("border-width", "2px")
+                        .style("border-color", "white")
+                        .style("background-color", "green");
 
                 div.append("div")
                         .style("width", "20%")
@@ -1818,26 +1842,28 @@
                         .property("disabled", true)
                         .on("change", function () {
                             filterArray[1] = this.checked;
-                        });
-//               ----------------------- 
-                var div = detailsHeaderSummary.append("div")
-                        .style("height", "20%")
-                        .style("margin", "10% 0%")
-                        .append("div")
-                        .style("width", "80%")
-                        .style("height", "100%")
-                        .style("display", "table")
-                        .style("border-radius", "5px")
-                        .style("border-style", "solid")
-                        .style("border-width", "2px")
-                        .style("border-color", "white")
-                        .style("background-color", "gray")
+                        })
                         .on("mouseover", function () {
-                            filterBarrierDetailsBody([0, 0, 1]);
+                            filterBarrierDetailsBody([0, 1, 0]);
                         })
                         .on("mouseout", function () {
                             filterBarrierDetailsBody(filterArray);
                         });
+//               ----------------------- 
+                var div = detailsHeaderSummary.append("div")
+                        .style("height", "33%")
+                        .append("div")
+                        .style("width", "80%")
+                        .style("height", "65%")
+                        .style("display", "table")
+                        .style("position", "relative")
+                        .style("top", "50%")
+                        .style("transform", "translateY(-50%)")
+                        .style("border-radius", "5px")
+                        .style("border-style", "solid")
+                        .style("border-width", "2px")
+                        .style("border-color", "white")
+                        .style("background-color", "gray");
 
                 div.append("div")
                         .style("width", "30%")
@@ -1866,6 +1892,12 @@
                         .property("disabled", true)
                         .on("change", function () {
                             filterArray[2] = this.checked;
+                        })
+                        .on("mouseover", function () {
+                            filterBarrierDetailsBody([0, 0, 1]);
+                        })
+                        .on("mouseout", function () {
+                            filterBarrierDetailsBody(filterArray);
                         });
 
                 barrierDetailsBody.append("div")
@@ -1884,43 +1916,6 @@
                         .text("Please choose a barrier to see data");
             }
 
-            function filterBarrierDetailsBody(filterArray) {
-                for (var i = 0; i < filterArray.length; i++) {
-                    var filterVariable;
-                    switch (i) {
-                        case 0:
-                            filterVariable = "failed";
-                            break;
-                        case 1:
-                            filterVariable = "success";
-                            break;
-                        case 2:
-                            filterVariable = "inactive";
-                            break;
-                    }
-                    if (filterArray[i] == 0) {
-                        d3.selectAll(".detailsItemDiv")
-                                .filter(function (d) {
-                                    return (d.mitigation.status == filterVariable);
-                                }).transition()
-                                .duration(100)
-                                .style("height", "0px")
-                                .each("end", function () {
-                                    d3.select(this).style("display", "none");
-                                });
-                    }
-                    else {
-                        d3.selectAll(".detailsItemDiv")
-                                .filter(function (d) {
-                                    return (d.mitigation.status == filterVariable);
-                                }).transition()
-                                .duration(100)
-                                .style("height", "20px")
-                                .style("display", "block");
-                    }
-                }
-            }
-
             function removeGraphAndChart(index) {
                 //reset all lines
                 d3.selectAll(".line").style("opacity", 0.2);
@@ -1928,51 +1923,32 @@
                 d3.select("#svgTable_" + index).remove();
             }
 
-            function bestMatch(array, index)
-            {
-                //console.log("blerah "+index);
-                var ordered = likelihoodRank.sort(function (a, b) {
-                    return a.id - b.id;
-                });
-                var best = maxim(ordered, index);
-                return best;
-            }
-
-            function maxim(array, index)
-            {
-                var max = 0;
-                var id;
-                for (i = 0; i < index; i++)
-                {
-                    //console.log("è nel max "+array[i].p+"   "+max);
-                    if (+array[i].p > max)
-                    {
-                        max = array[i].p;
-                        id = array[i].id;
-                        //console.log("è nel max");
+            function drawMostProbableAttack(activeNode) {
+                var mostProbableAttackId,
+                        maxProbability = 0;
+                totalAttacks.forEach(function (attack, index) {
+                    for (var i = 0; i < attack.attack.length; i++) {
+                        if (attack.attack[i].source.name == activeNode) {
+                            if (attack.probability > maxProbability) {
+                                maxProbability = attack.probability;
+                                mostProbableAttackId = index;
+                            }
+                            break;
+                        }
                     }
-                }
-                return id;
-            }
+                });
+                d3.select(".tableAttack").selectAll("svg").remove();
+                queueSVG = [];
+                createChart(mostProbableAttackId);
+                createGraph(mostProbableAttackId, 1); // 1 means is an istantiateOnGoing graph
 
-            function drawMostProbableAttack(indexOfAlert) {
-                if (likelihoodRank.length > 0) {
-                    //if(likelihoodRank[0].id!=idInstantiated){
-                    //idInstantiated=likelihoodRank[0].id;
-                    //console.log(likelihoodRank+" ++++++++ "+indexOfAlert);
-                    idInstantiated = bestMatch(likelihoodRank, indexOfAlert);
-                    //console.log("PARAPPPAAAAAAA---- "+idInstantiated);
+                $(".bottomMenu").animate({scrollLeft: "0px"}, 100, function () {
+                    $(".bottomMenu").animate({scrollLeft: $("#attackPreview_" + mostProbableAttackId).position().left}, 300);
+                });
 
+                d3.select("#attackPreview_" + mostProbableAttackId)
+                        .style("border-color", "red");
 
-                    d3.select(".tableAttack").selectAll("svg").remove();
-                    //d3.select(".bottomMenu").style("pointer-events","none");
-                    //d3.select(".bottomMenuLabel").style("display","none");
-                    queueSVG = [];
-                    var jsonAdressString = "json attack/attack" + idInstantiated + ".json";
-                    createChart(jsonAdressString, idInstantiated);
-                    createGraph(idInstantiated, 1); // 1 means is an istantiateOnGoing graph
-                    d3.select("#attackPreview_" + idInstantiated).style("border-color", "red");
-                }
             }
 
             function clearProbableAttack() {
@@ -2004,7 +1980,8 @@
                         .attr("id", "attackPreview_" + indexOfPreview)
                         .style("width", wAttackPreview + "px")
                         .style("height", "98%")
-                        .style("position", "relative");
+                        .style("position", "relative")
+                        .style("border-color", "white");
 
                 attackPreviewDiv.append("svg")
                         .style("width", wAttackPreview + "px")
@@ -2016,66 +1993,20 @@
                         .style("width", wAttackPreview + "px")
                         .style("position", "absolute")
                         .style("top", "0px");
-
-                globalAttackEvolution = indexOfPreview - 1;
                 var svgPreview = attackPreviewDiv.select("svg");
-                var json = "json attack/attack" + indexOfPreview + ".json";
-                //update likelihood array
-                d3.json(json, function (source) {
-                    totalAttacks[indexOfPreview - 1] = source;
-                    var o = {
-                        id: indexOfPreview,
-                        p: source.probability
-                    };
-                    if (likelihoodRank.length == 0) {
-                        likelihoodRank.push(o);
-                    }
-                    else {
-                        var i = 0;
-                        var position = -1;
-                        while (i < likelihoodRank.length) {
-                            var p = likelihoodRank[i].p;
-                            if (source.probability >= p) {
-                                position = i;
-                                break;
-                            }
-                            i++;
-                        }
-                        if (position == -1) {
-                            likelihoodRank.push(o);
-                        }
-                        else {
-                            likelihoodRank.splice(position, 0, o);
-                        }
-                    }
 
-                    //blink animation
-                    if (mode == 0) {
-                        attackPreviewDiv.transition().duration(500).style("border-color", "#fff");
-                    }
-                    else {
-                        if (idInstantiated === indexOfPreview) {
-                            attackPreviewDiv.transition().duration(500).style("border-color", "#f00");
-                        }
-                        else {
-                            attackPreviewDiv.transition().duration(500).style("border-color", "#fff");
-                        }
-                    }
-
-                });
                 svgPreview.on("click", function () {
-
                     //delete temporary accumulate arcs
                     d3.selectAll("#tempArc").remove();
                     //if we are in proactive mode we add the graphs on the map
                     if (mode == 0) {
                         var div = d3.select(d3.select(this).node().parentNode);
                         var index = (div.attr("id")).match(/[0-9]+/)[0];
-                        var j = "json attack/attack" + index + ".json";
+
                         if (div.style("border-top-color") == "rgb(255, 255, 255)") {
                             div.style("border-color", "yellow");
                             if (queueSVG.length == 0) {
-                                createChart(j, index);
+                                createChart(index);
                                 createGraph(index, 0);
                             }
                             else {
@@ -2083,7 +2014,7 @@
                                 var last = queueSVG[queueSVG.length - 1];
                                 d3.select("#svgTable_" + last).attr("display", "none");
                                 //add new chart
-                                createChart(j, index);
+                                createChart(index);
                                 createGraph(index, 0);
                             }
                             queueSVG.push(index);
@@ -2103,9 +2034,8 @@
                         }
                     }
                 });
-                drawPreviewGraph(indexOfPreview, svgPreview, json);
+                drawPreviewGraph(indexOfPreview, svgPreview);
             }
-
 
             function replacePoints(string)
             {
@@ -2120,7 +2050,6 @@
                 return res;
             }
 
-
             function getNode(node)
             {
                 for (k = 0; k < totalNode.length; k++)
@@ -2130,92 +2059,6 @@
                 }
                 console.log("(!) getNode(node): node " + node + " is not found in totalNode");
             }
-
-            function computeBarrier(index, s, t)
-            {
-                var result = [];
-                var activeResponse = totalResponse[index]["response-plan"];
-                for (k = 0; k < activeResponse.length; k++)
-                {
-                    if ((activeResponse[k].mitigation.edge.source === s) && (activeResponse[k].mitigation.edge.target === t))
-                        result.push(activeResponse[k]);
-                }
-                return result;
-            }
-
-            function mitigationsPreview(mitigations)
-            {
-                //count all states of mitifation action 
-                var success = 0;
-                var failed = 0;
-                for (var m = 0; m < mitigations.length; m++)
-                {
-                    if (mitigations[m].mitigation.status === "success")
-                        success = success + 1;
-                    if (mitigations[m].mitigation.status === "failed")
-                        failed = failed + 1;
-                }
-                var inactive = mitigations.length - success - failed;
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueFail").text(failed + "/" + mitigations.length);
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueSuccess").text(success + "/" + mitigations.length);
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueInactive").text(inactive + "/" + mitigations.length);
-
-                var colorScale = d3.scale.ordinal()
-                        .domain(["success", "failed", "inactive"])
-                        .range(["green", "red", "gray"]);
-
-                var detailsBody = d3.select("#barrierDetailsBody");
-                d3.select("#barrierDetailsHeaderBarrierSummary").selectAll("input")
-                        .property("checked", true)
-                        .property("disabled", false);
-
-                mitigations.forEach(function (m) {
-                    var detailsItem = detailsBody.append("div")
-                            .attr("class", "detailsItemDiv")
-                            .datum(m)
-                            .attr("align", "left")
-                            .style("margin-left", "10px")
-                            .style("height", "20px");
-
-                    var svg = detailsItem.append("svg")
-                            .attr("height", "20px");
-
-                    svg.append("svg:circle")
-                            .attr("cx", 10)
-                            .attr("cy", 10)
-                            .attr("r", 4)
-                            .style("fill", colorScale(m.mitigation.status));
-
-                    svg.append("text")
-                            .attr("x", 20)
-                            .attr("y", 15)
-                            .text("ID: " + m.mitigation.ID + " type: " + m.mitigation.name);
-                });
-            }
-
-            function clearMitigationPreview() {
-                d3.selectAll(".detailsItemDiv").remove();
-                d3.select("#barrierDetailsHeaderBarrierSummary").selectAll("input")
-                        .property("checked", false)
-                        .property("disabled", true);
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueFail").text("--/---");
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueSuccess").text("--/---");
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueInactive").text("--/---");
-            }
-
-            function showDetails(data, h)
-            {
-                //console.log(h);
-                d3.select("#barrierDetailsArea")
-                        .append("text")
-                        .attr("x", "70px")
-                        .attr("y", function () {
-                            return h + 10;
-                        })
-                        .style("font-size", "10px")
-                        .text("ID: " + data.ID + " type: " + data.name + " node: " + data.edge.target);
-            }
-
 
             /**
              * Draws barrier rectangles
@@ -2255,9 +2098,8 @@
                             .each(function () {
                                 var l = this.getTotalLength();
                                 if (l < rectHeight * 1.9) {//if rectange doesnt fit line
-                                    rectHeight = l * 0.6;
-                                    rectStandoff = l * 0.10;
-                                    smallEdgeShifting = 10;
+                                    rectHeight = l - rectStandoff - 11; //11 alerted node radius
+                                    //smallEdgeShifting = 10;
                                 }
                                 var p1 = this.getPointAtLength(l - rectStandoff);
                                 var p2 = this.getPointAtLength(l - rectHeight); // TODO: make secobd it not fixed
@@ -2266,6 +2108,7 @@
                                 var angleInDegrees = (Math.atan2(dY, dX) / Math.PI * 180.0) + 90;
                                 positionData = {
                                     startPoint: p1,
+                                    smallEdgeShifting: smallEdgeShifting,
                                     angleInDegrees: angleInDegrees,
                                     onEdgeFlag: true,
                                     outOfEdgePosition: {x: null, y: null}
@@ -2278,6 +2121,7 @@
                     var g = layer.append("g")
                             .datum(mitigations)
                             .attr("class", "barrier")
+                            .style("cursor", "pointer")
                             .attr("transform", "translate(" +
                                     (mitigations.position.startPoint.x - rectWidth / 2) +
                                     "," + (mitigations.position.startPoint.y) +
@@ -2334,19 +2178,19 @@
                                     d.position.outOfEdgePosition.y = d.position.startPoint.y + offsetY;
                                     d3.select(this).transition()
                                             .duration(500)
-                                            .ease("linear")
+                                            //.ease("linear")
                                             .attr("transform", "translate("
                                                     + (offsetX + d.position.startPoint.x) + ","
                                                     + (offsetY + d.position.startPoint.y) + ") scale(3)")
                                             .each("end", function () {
                                                 $(this).animate({//hide
-                                                    width: 'toggle',
-                                                    height: 'toggle',
+                                                    width: "toggle",
+                                                    height: "toggle"
                                                 }, 10, function () {
                                                     $("#barrierDetailsHeaderSVGforBarrier").prepend($(this)); //move (when animation finished)
                                                     $(this).animate({//show again
-                                                        width: 'toggle',
-                                                        height: 'toggle',
+                                                        width: "toggle",
+                                                        height: "toggle"
                                                     }, 10, function () {
                                                         d3.select(this).transition()
                                                                 .attr("transform", "translate(0,0) scale(2)")
@@ -2379,10 +2223,6 @@
                                             height: "toggle"
                                         }, 0);
                                     });
-                                    console.log(d);
-                                    console.log("translate("
-                                            + d.position.outOfEdgePosition.x + ","
-                                            + d.position.outOfEdgePosition.y + ") scale(3)");
                                     d3.select(this)
                                             .attr("transform", "translate("
                                                     + d.position.outOfEdgePosition.x + ","
@@ -2393,10 +2233,12 @@
                                                     (d.position.startPoint.x - rectWidth / 2) +
                                                     "," + (d.position.startPoint.y) +
                                                     ") rotate(" + d.position.angleInDegrees + " " +
-                                                    rectWidth / 2 + " 0)");
+                                                    rectWidth / 2 + " 0)")
+                                            .selectAll("rect")
+                                            .attr("x", d.position.smallEdgeShifting);
                                 }
-                            })
-                            .style("cursor", "pointer");
+                            });
+
                     g.append("svg:rect")
                             .attr("x", smallEdgeShifting)
                             .attr("width", rectWidth)
@@ -2425,19 +2267,205 @@
                 }
             }
 
+            function mitigationsPreview(mitigations)
+            {
+                //count all states of mitifation action 
+                var success = 0;
+                var failed = 0;
+                for (var m = 0; m < mitigations.length; m++)
+                {
+                    if (mitigations[m].mitigation.status === "success")
+                        success = success + 1;
+                    if (mitigations[m].mitigation.status === "failed")
+                        failed = failed + 1;
+                }
+                var inactive = mitigations.length - success - failed;
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueFail").text(failed + "/" + mitigations.length);
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueSuccess").text(success + "/" + mitigations.length);
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueInactive").text(inactive + "/" + mitigations.length);
+                d3.select("#barrierDetailsHeaderBarrierSummary").selectAll("input")
+                        .property("checked", true)
+                        .property("disabled", false);
+
+                var colorScale = d3.scale.ordinal()
+                        .domain(["success", "failed", "inactive"])
+                        .range(["green", "red", "gray"]);
+
+                var detailsBody = d3.select("#barrierDetailsBody");
+
+                mitigations.forEach(function (m) {
+
+                    var mititgationItem = {
+                        m: m,
+                        displayBody: "none"
+                    };
+
+                    var detailsItem = detailsBody.append("div")
+                            .attr("class", "detailsItemDiv")
+                            .data([mititgationItem]);
+
+                    var detailsItemHeader = detailsItem.append("div")
+                            .attr("class", "detailsItemHeader")
+                            .attr("align", "left")
+                            .on("click", function (d) {
+                                d.displayBody = d.displayBody == 'table' ? 'none' : 'table';
+                                if (d.displayBody == 'table') {
+                                    d3.select(this.parentNode)
+                                            .transition()
+                                            .duration(100)
+                                            .style("height", '130px')
+                                            .each("end", function () {
+                                                d3.select(this).select(".detailsItemBody")
+                                                        .style("display", d.displayBody);
+                                            });
+                                }
+                                else {
+                                    d3.select(this.parentNode).select(".detailsItemBody")
+                                            .style("display", d.displayBody);
+                                    d3.select(this.parentNode).transition()
+                                            .duration(100)
+                                            .style("height", '20px');
+                                }
+                            });
+
+                    var svg = detailsItemHeader.append("svg")
+                            .attr("height", "20px");
+                    svg.append("svg:circle")
+                            .attr("cx", 10)
+                            .attr("cy", 10)
+                            .attr("r", 4)
+                            .style("fill", colorScale(m.mitigation.status));
+                    svg.append("text")
+                            .attr("x", 25)
+                            .attr("y", 15)
+                            .text(m.mitigation.name);
+
+                    var detailsItemBody = detailsItem.append("div")
+                            .attr("class", "detailsItemBody");
+                    var summary = detailsItemBody.append("div")
+                            .attr("class", "detailsItemBodySummary");
+                    summary.append("text")
+                            .text("Status:")
+                            .style('display', 'block');
+                    var summarySvg = summary.append("svg")
+                            .attr("height", "30px")
+                            .attr('width', '80px');
+                    summarySvg.append("svg:circle")
+                            .attr("cx", 15)
+                            .attr("cy", 15)
+                            .attr("r", 15)
+                            .style("fill", colorScale(m.mitigation.status));
+                    summarySvg.append("text")
+                            .attr("x", 35)
+                            .attr("y", 20)
+                            .text(m.mitigation.status);
+                    summary.append("text")
+                            .style('display', 'block')
+                            .text("Start: " + (m.mitigation.status == 'success' || m.mitigation.status == 'failed' ? "12:15 12/04/2015" : "--:-- --/--/----"));
+                    summary.append("text")
+                            .style('display', 'block')
+                            .text("End: " + (m.mitigation.status == 'success' ? "12:45 12/04/2015" : "--:-- --/--/----"));
+                    var detailsItemBodyMitigationData = detailsItemBody.append("div")
+                            .attr("class", "detailsItemBodyMitigationData");
+                    detailsItemBodyMitigationData.append("text")
+                            .text("ID: " + m.mitigation.ID);
+                    detailsItemBodyMitigationData.append("text")
+                            .text("Type: " + m.mitigation.type);
+                    detailsItemBodyMitigationData.append("text")
+                            .text("Source: " + m.mitigation.edge.source);
+                    detailsItemBodyMitigationData.append("text")
+                            .text("Target: " + m.mitigation.edge.target);
+                    var detailsItemBodyMitigationDataButtonDiv = detailsItemBodyMitigationData.append("div");
+                    detailsItemBodyMitigationDataButtonDiv.append("button")
+                            .text("Stop")
+                            .property("disabled", m.mitigation.status == "failed" ? false : true);
+                    detailsItemBodyMitigationDataButtonDiv.append("button")
+                            .text("Apply")
+                            .property("disabled", m.mitigation.status == "success" || m.mitigation.status == "inactive" ? false : true);
+                });
+            }
+
+            function filterBarrierDetailsBody(filterArray) {
+                d3.select(".detailsItemBody")
+                        .style("display", 'none');
+
+                d3.selectAll(".detailsItemDiv")
+                        .transition()
+                        .duration(100)
+                        .style("height", "0px")
+                        .each("end", function () {
+                            d3.select(this).style("display", "none");
+
+                            for (var i = 0; i < filterArray.length; i++) {
+                                var filterVariable;
+                                switch (i) {
+                                    case 0:
+                                        filterVariable = "failed";
+                                        break;
+                                    case 1:
+                                        filterVariable = "success";
+                                        break;
+                                    case 2:
+                                        filterVariable = "inactive";
+                                        break;
+                                }
+
+                                if (filterArray[i] == 0) {
+                                    d3.selectAll(".detailsItemDiv")
+                                            .filter(function (d) {
+                                                return (d.m.mitigation.status == filterVariable);
+                                            }).transition()
+                                            .duration(100)
+                                            .style("height", "0px")
+                                            .each("end", function () {
+                                                d3.select(this).style("display", "none");
+                                            });
+                                }
+                                else {
+                                    d3.selectAll(".detailsItemDiv")
+                                            .filter(function (d) {
+                                                return (d.m.mitigation.status == filterVariable);
+                                            }).transition()
+                                            .duration(100)
+                                            .style("height", function (d) {
+                                                return d.displayBody == 'table' ? '130px' : '20px';
+                                            })
+                                            .style("display", "block");
+
+                                    d3.select(".detailsItemBody")
+                                            .style("display", function (d) {
+                                                return d.displayBody;
+                                            });
+                                }
+                            }
+                        });
+
+            }
+
+            function clearMitigationPreview() {
+                d3.selectAll(".detailsItemDiv").remove();
+                d3.select("#barrierDetailsHeaderBarrierSummary").selectAll("input")
+                        .property("checked", false)
+                        .property("disabled", true);
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueFail").text("--/---");
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueSuccess").text("--/---");
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueInactive").text("--/---");
+            }
+
             /** 
              * Draws red and animates attacked nodes
              * @param {num} indexOfPreview Index of chosen preview
+             * @param {num} duration
              * @returns {undefined}
              */
-            function reactiveAlert(indexOfPreview, duration, delay) {//TODO:clean
+            function reactiveAlert(indexOfPreview, duration) {//TODO:clean
 
                 if (mode == 1) {
                     clearProbableAttack();
                     createGraph(indexOfPreview, 2);
-                    var allAlertNodes = alertNodes.slice(0, indexOfPreview); //takes first first indexOfPreview number of nodes from alert nodes
+                    var allAlertNodes = alertNodes.slice(0, indexOfPreview + 1); //takes first first indexOfPreview number of nodes from alert nodes
                     //lets find the nodes and fill them red
-                    var activeNode = alertNodes[indexOfPreview - 1];
+                    var activeNode = alertNodes[indexOfPreview];
                     var activeAlertNodes = d3.selectAll(".node").filter(function (d) {
                         return allAlertNodes.indexOf(d.name) != -1;
                     });
@@ -2449,26 +2477,23 @@
                         return d.name == activeNode;
                     }).select("circle")
                             .transition()
-                            .duration(duration)
+                            .duration(duration * 0.1)
                             .attr("r", 20)
                             .style("fill", "red")
                             .each("end", function () {
                                 d3.select(this)
                                         .transition()
-                                        .delay(delay)
-                                        .duration(duration)
+                                        .delay(duration * 0.1)
+                                        .duration(duration * 0.1)
                                         .attr("r", 11)
-
                                         .each("end", function () {
                                             d3.select(this)
                                                     .attr("stroke", "black")
                                                     .attr("stroke-width", 2);
+                                            createGraph(indexOfPreview, 3);
                                             setTimeout(function () {
-                                                createGraph(indexOfPreview, 3);
-                                            }, 1000);
-                                            setTimeout(function () {
-                                                drawMostProbableAttack(indexOfPreview);
-                                            }, 2000);
+                                                drawMostProbableAttack(activeNode);
+                                            }, (duration - 0.1 * 3) / 3)
                                         });
                             });
                 }
