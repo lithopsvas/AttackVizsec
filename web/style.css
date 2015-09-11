@@ -133,6 +133,7 @@ html, #map {
     border: 2px solid white;
     background-color: #3d3d3d;
     border-radius: 8px;
+    font: 16px sans-serif;
 }
 
 .sideMenuLabel {
@@ -150,8 +151,6 @@ html, #map {
     border-width: 1px;
     border-color:#E6E6E6;
     background-image:url(img/button_menu.png);
-
-
 }
 
 .tableAttack {
@@ -160,7 +159,6 @@ html, #map {
     font: 13px sans-serif;
     cursor: pointer;
 }
-
 #responsePlanDiv, #buttonsDiv, #donutChartDiv{
     margin: 1px;
     padding:5px;
@@ -169,42 +167,141 @@ html, #map {
     border-width: 1px;
     border-color:#E6E6E6;
 }
-
 #responsePlanHeader{
-    font: 17px sans-serif;
-    color:white;
+    height: 5%;
     text-align: center;
-    font-weight: bold;
 }
-#responsePlanHeader p{
+#responsePlanBody{
+    height: 95%
+}
+#responsePlanHeader p{    
+    font-weight: bold;
+    font: 16px sans-serif;
+    color:white;
     position: relative;
     top: 50%;
     transform: translateY(-50%);
+    margin: 0;
 }
-
+#barrierDetailsArea{
+    height: 100%;
+}
+#barrierDetailsHeader{
+    height: 40%
+}
 #barrierDetailsBody{
+    height: 60%;
+    border-radius: 5px;
+    border: 1px dotted white;
     overflow-x: hidden !important;
     overflow-y: auto;
 }
+#barrierDetailsHeaderResponsePlanContainer{
+    height: 60%;
+    display: table;
+    width: 100%;
+}
+#responsePlanSummary{
+    width: 45%;
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
 
+    color: white;
+}
+#responsePlanSummary text{
+    display: block;  
+}
+#responsePlanSummary text:nth-of-type(1){
+    font: 14px sans-serif;
+    font-weight: bold;
+}
+#responsePlanSummary text:nth-of-type(2){
+    font: 30px sans-serif;
+    font-weight: bold;
+}
+#responsePlanSummary text:nth-of-type(3), text:nth-of-type(4){
+    font: 12px sans-serif;
+}
+#responsePlanSummary text:nth-of-type(2){
+    margin-top: 5px;
+}
+#responsePlanData{
+    height: 100%;
+    width: 55%;
+    display: table-cell;
+    position: relative;
+}
+#responsePlanData text{
+    display: block;
+    font: 11px sans-serif;
+    color: white;
+    margin-top: 4px;
+    white-space: nowrap
+}
+#responsePlanData select{
+    height: 30px;
+    width: 100%;
+    margin-top: 6px;
+    background-color: #606060;
+    border-radius: 10px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #FFF;
+    color: white;
+}
+#responsePlanData div{
+    position: absolute;
+    bottom: 3px;
+    right: 0px;
+    height: 25px;
+    width: 130px;
+}
+#barrierDetailsHeaderBarrierContainer{
+    height: 40%;
+    width: 100%;
+    display: table;
+    border-top: 1px dotted #FFF;
+}
+
+#barrierDetailsHeaderBarrierSummary{
+    height: 100%;
+    width: 100%;
+    position: relative;
+    top: 0px;
+    display: table-cell;
+    vertical-align: middle;
+}
+#barrierDetailsHeaderBarrierSummary span{
+    display: inline-block;
+    width: 31%;
+    height: 100%;
+    position: relative;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #FFF;
+}
+#barrierDetailsHeaderBarrierSummary span > div{
+    display: table;
+    height: 100%;
+}
 .barrierDetailsHeaderBarrierSummaryValue {
     font: 20px sans-serif;
     color: white;
 }
-
 .barrierDetailsHeaderBarrierSummaryTitle {
     font: 13px sans-serif;
     color: white;
     font-weight: bold;
 }
-
 .detailsItemDiv{
     height: 20px;
     width: 100%;
     border-bottom: 1px solid rgb(104, 104, 104);
     border-top: 1px solid rgb(104, 104, 104);
 }
-
 .detailsItemHeader{
     height: 20px;
     width: 100%;
@@ -213,13 +310,11 @@ html, #map {
     font: 14px sans-serif;
     fill:white;
 }
-
 .detailsItemBody {
     height: 100px;
     width: 100%;
     display: none;
 }
-
 .detailsItemBodySummary{
     width: 45%;
     height: 100%;
@@ -230,7 +325,6 @@ html, #map {
     color: white;
     fill:white;
 }
-
 .detailsItemBodySummary text:nth-of-type(2), text:nth-of-type(3){
     font: 11px sans-serif;
     color: white;
@@ -238,14 +332,12 @@ html, #map {
 .detailsItemBodySummary text:nth-of-type(2){
     margin-top: 5px;
 }
-
 .detailsItemBodyMitigationData{
     height: 100%;
     width: 55%;
     display: table-cell;
     position: relative;
 }
-
 .detailsItemBodyMitigationData text{
     display: block;
     font: 11px sans-serif;
@@ -253,7 +345,6 @@ html, #map {
     margin-top: 3px;
     white-space: nowrap
 }
-
 .detailsItemBodyMitigationData div{
     position: absolute;
     bottom: 0px;
@@ -261,16 +352,28 @@ html, #map {
     height: 25px;
     width: 130px;
 }
-
 .detailsItemBodyMitigationData button, 
 .attackPreview button, 
-#buttonsDiv button{
+#buttonsDiv button,
+#barrierDetailsHeaderResponsePlanContainer button{
     height: 25px;
     width: 50px;
-    margin-right: 10px;
     background-color: #606060;
     border-radius: 10px;
     border-style: solid;
     border-width: 2px;
     border-color: #FFF;
+    margin-left: 3px;
+    color: white;
+}
+#buttonsDiv{
+    white-space: nowrap;
+}
+.barrierPie path{
+    fill: rgb(236, 139, 57);
+    stroke: #000;
+    stroke-width: 1px;
+    opacity: 0;
+    cursor: pointer;
+    display: none;
 }

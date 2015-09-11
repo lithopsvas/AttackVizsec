@@ -4,7 +4,7 @@
 <html>
 
     <head>
-        <meta name="viewport" content="initial-scale=0.7, user-scalable=no, width=device-width" />
+        <meta name="viewport" content="initial-scale=0.7, user-scalable=no" />
         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
         <script type="text/javascript" src="javascript/d3.v2.js"></script>
         <script type="text/javascript" src="javascript/d3.tip.v0.6.3.js"></script>
@@ -16,8 +16,8 @@
         </style>
     </head>
 
-    <body onload="removeElements();
-            drawPreviews();">
+    <body onload="
+            createMap();">
 
         <form style="position: absolute; 
               z-index: 1; 
@@ -26,7 +26,8 @@
               border-radius: 5px; 
               border-style: solid;
               border-width: 1px;
-              border-color:#E6E6E6;" >
+              border-color:#E6E6E6;
+              font: 16px sans-serif;" >
             <input id="pro" type="radio" name="mode" value="proactive" onClick="proactive()" >Proactive
             <br>
             <input id="re" type="radio" name="mode" value="reactive" onClick="reactive(1)"  checked>Reactive
@@ -186,10 +187,10 @@
 
 // TODO: zoom for proactive mode
                 removeAllElements();
-                for (var i = 0; i < currentPreviewIndex; ++i)
+                for (var i = 0; i < currentPreviewIndex - 1; ++i)
                     reactiveAlert(i, 0);
                 setTimeout(function () {
-                    reactiveAlert(currentPreviewIndex, 300);
+                    reactiveAlert(currentPreviewIndex - 1, 300);
                 }, 1000);
             });
 
@@ -241,7 +242,6 @@
                     hMap = h - hBottomMenu,
                     wSVGPreview = wAttackPreview,
                     hPreviewHeaderDiv = 35,
-                    likelihoodRank = [],
                     hSVGPreview = hBottomMenu - 30,
                     nodeRadius = 7;
 
@@ -259,45 +259,19 @@
                     createNodeList(source);
 
                 });
-                for (var index = 0; index <= 8; index++) {
-                    d3.json("response_plan/RP" + index + ".json", function (data)
-                    {
-                        totalResponse.push(data);
-                    });
-                    //update likelihood array
-                    d3.json("json attack/attack" + index + ".json", function (source) {
-                        totalAttacks.push(source);
-                        var o = {
-                            id: index,
-                            p: source.probability
-                        };
-                        if (likelihoodRank.length == 0) {
-                            likelihoodRank.push(o);
-                        }
-                        else {
-                            var i = 0;
-                            var position = -1;
-                            while (i < likelihoodRank.length) {
-                                var p = likelihoodRank[i].p;
-                                if (source.probability >= p) {
-                                    position = i;
-                                    break;
-                                }
-                                i++;
-                            }
-                            if (position == -1) {
-                                likelihoodRank.push(o);
-                            }
-                            else {
-                                likelihoodRank.splice(position, 0, o);
-                            }
-                        }
-                    });
-                }
+
+                d3.json("response_plan/RPALL.json", function (data)
+                {
+                    totalResponse = data;
+                });
+//                for (var index = 0; index <= 8; index++) {
+                d3.json("json attack/attackALL.json", function (source) {
+                    totalAttacks = source;
+                });
+//                }
             }
 
             function initializeInterface() {
-                createMap();
                 createSideMenu();
                 createBottomMenu();
                 removeElements();
@@ -402,6 +376,7 @@
                                 .attr("d", "M0,-5L10,0L0,5");
                         d3.selectAll(".line").remove();
                         d3.selectAll(".barrier").remove();
+                        d3.selectAll(".nodeBarrier").remove();
                         var edges = layer.select("#links").selectAll(".line")
                                 .data(totalEdges)
                                 //.each(transformLine)
@@ -436,7 +411,106 @@
                                 .attr("r", nodeRadius) //possiamo cambiare la dimensione del nodo
                                 .style("fill", "#3d3d3d")
                                 .attr("cx", padding)
-                                .attr("cy", padding);
+                                .attr("cy", padding)
+                                .style("cursor", "pointer")
+                                .on("mouseover", function (node) {
+                                    d3.selectAll(".nodeBarrier")
+                                            .filter(function (nodeBarrier) {
+                                                return nodeBarrier.name == node.name;
+                                            })
+                                            .select("path")
+                                            .style("display", "initial")
+                                            .transition()
+                                            .duration(200)
+                                            .style("opacity", "1");
+                                    d3.selectAll(".barrier")
+                                            .filter(function (barrier) {
+                                                return barrier.targetNode != node && barrier.position.onEdgeFlag;
+                                            })
+                                            .transition()
+                                            .duration(200)
+                                            .style("fill-opacity", "0")
+                                            .style("stroke-opacity", "0");
+                                    d3.selectAll(".barrier")
+                                            .filter(function (barrier) {
+                                                return barrier.targetNode == node;
+                                            })
+                                            .style("display", "initial")
+                                            .transition()
+                                            .duration(200)
+                                            .style("fill-opacity", "1")
+                                            .style("stroke-opacity", "1");
+
+                                    layer.selectAll(".line")
+                                            .style("opacity", "0.1")
+                                            .filter(function (d) { //ingoing arcs
+                                                return (d.target.name == node.name);
+                                            })
+                                            .style("opacity", "0.5");
+
+                                })
+                                .on("mouseout", function (node) {
+                                    d3.selectAll(".nodeBarrier")
+                                            .filter(function (nodeBarrier) {
+                                                return nodeBarrier.name == node.name;
+                                            })
+                                            .select("path")
+                                            .transition()
+                                            .duration(50)
+                                            .style("opacity", "0")
+                                            .transition()
+                                            .style("display", "none");
+                                    d3.selectAll(".barrier")
+                                            .filter(function (barrier) {
+                                                return d3.selectAll("#" + barrier.edgeId)[0].length != 0;
+                                            })
+                                            .transition()
+                                            .duration(200)
+                                            .style("fill-opacity", "1")
+                                            .style("stroke-opacity", "1")
+                                    d3.selectAll(".barrier")
+                                            .filter(function (barrier) {
+                                                return barrier.targetNode == node && d3.selectAll("#" + barrier.edgeId)[0].length == 0;
+                                            })
+                                            .transition()
+                                            .duration(50)
+                                            .style("fill-opacity", "0")
+                                            .style("stroke-opacity", "0")
+                                            .transition()
+                                            .style("display", "none");
+
+                                    layer.selectAll(".line")
+                                            .style("opacity", "0.1")
+                                            .filter(function (d) { //outgoing arcs
+                                                return (d.source.name == alertNodes[currentPreviewIndex - 1]);
+                                            })
+                                            .style("opacity", "0.5");
+                                })
+                                .on("click", function (node) {
+                                    //if there are bariers yet, call click() to put them on graph
+                                    d3.select("#barrierDetailsHeaderSVGforBarrier").selectAll("g")
+                                            .each(function (d, i) {
+                                                d3.select(this).on("click").apply(this, [d, i]);
+                                                d3.select(this).transition()
+                                                        .delay(600)
+                                                        .duration(200)
+                                                        .style("fill-opacity", "0")
+                                                        .style("stroke-opacity", "0");
+                                            });
+                                    clearMitigationPreview();
+                                    var mitigations = [];
+                                    d3.selectAll(".barrier")
+                                            .filter(function (barrier) {
+                                                return barrier.targetNode == node;
+                                            })
+                                            .each(function (barrier) {
+                                                mitigations.push(barrier);
+                                            })
+                                    if (mitigations.length > 0)
+                                        mitigationsPreview(mitigations);
+                                });
+
+
                         nodes.append("text")
                                 .attr("x", padding + 7)
                                 .attr("y", padding)
@@ -444,6 +518,31 @@
                                 .text(function (d) {
                                     return d.name;
                                 });
+                        mm++;
+
+                        var arc = d3.svg.arc()
+                                .outerRadius(25)
+                                .innerRadius(20);
+                        var pie = d3.layout.pie()
+                                .sort(null)
+                                .value(function (d) {
+                                    return d;
+                                });
+                        var barriers = layer.select("#barriers").selectAll(".nodeBarrier")
+                                .data(totalNode)
+                                .each(transformNode)
+                                .enter()
+                                .append("svg")
+                                .each(transformNode)
+                                .attr("class", "nodeBarrier")
+                                .selectAll(".barrierPie")
+                                .data(pie([1]))
+                                .enter()
+                                .append("g")
+                                .attr("class", "barrierPie")
+                                .attr("transform", "translate(" + padding + "," + padding + ")")
+                                .append("path")
+                                .attr("d", arc);
                         /**
                          * Fills originalPos var and returns x and y
                          * @param {type} d
@@ -487,9 +586,21 @@
                 };
                 // Bind our overlay to the map
                 overlay.setMap(map);
+                setTimeout("drawPreviews()", 1000);
             }
 
             function drawPreviews() {
+//                console.log("originalPos:");
+//                console.log(originalPos);
+//                console.log("totalAttacks:");
+//                console.log(totalAttacks);
+//                console.log("totalEdges");
+//                console.log(totalEdges);
+//                console.log("totalNode");
+//                console.log(totalNode);
+//                console.log("totalResponse");
+//                console.log(totalResponse);
+
                 drawDonutChart();
                 drawButtons();
                 //var time = 3000;
@@ -558,7 +669,6 @@
                             crit += parseFloat(x.score);
                         });
                     }
-
                     if (!check(subnetList, subnet)) {
                         subnetList.push({
                             subnet: subnet,
@@ -583,7 +693,6 @@
                         fixed: true //we lock the position
                     });
                     totalNode.forEach(function (d) {
-
                         if (d.subnet == subnet && d.name != name)
                             totalEdges.push({
                                 source: i,
@@ -626,9 +735,11 @@
                         .on("click", function () {
                             if (sideMenuVisible) {
                                 sideMenu.transition().style("right", -wSideMenu + "px").duration(500);
+                                bottomMenuContainer.transition().duration(500).style("width", w + "px");
                                 sideMenuVisible = false;
                             } else {
                                 sideMenu.transition().duration(500).style("right", "0px");
+                                bottomMenuContainer.transition().duration(500).style("width", w - wSideMenu + "px");
                                 sideMenuVisible = true;
                             }
                         })
@@ -668,7 +779,6 @@
                         .attr("class", "bottomMenuContainer")
                         .style("height", hBottomMenu + "px")
                         .style("width", w - wSideMenu + "px")
-                        .style("max-width", w - wSideMenu + "px")
                         .style("position", "absolute")
                         .style("bottom", "0px")
                         .style("left", "0px");
@@ -691,6 +801,7 @@
                 bottomMenuContainer.append("div")
                         .attr("class", "bottomMenu")
                         .style("height", hBottomMenu + "px")
+                        .style("width","100%")
                         .attr("align", "left");
             }
 
@@ -1168,7 +1279,7 @@
                 });
             }
 
-            function createGraph(attackIndex, type) { //attackIndex = likelihoodRank[0].id;
+            function createGraph(attackIndex, type) {
 
                 var index = 0;
                 var id;
@@ -1274,8 +1385,17 @@
                         for (var k = 0; k < totalAttacks[h].attack.length; k++)//for each attack path in attack
                         {
                             outerloop:
+
                                     if (totalAttacks[h].attack[k].source.name === activeNode)//if attack path goes from our activeNode 
                             {
+//                                var noEdge = true;
+//                                totalEdges.forEach(function (edge) {
+//                                    if (totalAttacks[h].attack[k].source.name == edge.source.name && totalAttacks[h].attack[k].target.name == edge.target.name) {
+//                                        noEdge = false;
+//                                    }
+//                                });
+//                                if (noEdge)
+//                                    break;
                                 //we compute mitigations anyway
                                 var s = totalAttacks[h].attack[k].source.name;
                                 var t = totalAttacks[h].attack[k].target.name;
@@ -1303,6 +1423,8 @@
                                     });
                                     barriers.push({
                                         edgeId: id + replacePoints(s) + "-" + replacePoints(t),
+                                        sourceNode: getNode(s),
+                                        targetNode: getNode(t),
                                         barrierData: [barrierData],
                                         barrierPosition: []
                                     });
@@ -1635,15 +1757,15 @@
 
                 var divButtons = d3.select("#buttonsDiv");
                 divButtons.append("button")
-                        .style("width", 80 + "px")
+                        .style("width", 70 + "px")
                         .style("height", 25 + "px")
-                        .text("Play 1")
+                        .text("Play 0")
                         .on("click", function () {
                             if (currentPreviewIndex == -1) {
                                 removeAllElements();
                             }
                             else {
-                                reactiveAlert(currentPreviewIndex, 1000);
+                                reactiveAlert(currentPreviewIndex, 3000);
                             }
                             currentPreviewIndex++;
                             if (currentPreviewIndex >= 9) {
@@ -1654,7 +1776,7 @@
                                 d3.select(this).text("Play " + currentPreviewIndex);
                         });
                 divButtons.append("button")
-                        .style("width", 80 + "px")
+                        .style("width", 70 + "px")
                         .style("height", 25 + "px")
                         .text("Play all")
                         .on("click", function () {
@@ -1670,7 +1792,7 @@
                             }
                         });
                 divButtons.append("button")
-                        .style("width", 80 + "px")
+                        .style("width", 70 + "px")
                         .style("height", 25 + "px")
                         .text("Reset")
                         .on("click", function () {
@@ -1687,39 +1809,61 @@
                         .style("height", h - height - 25 - 5 * 3 - 30 + "px")
                         .style("background-color", "#3d3d3d");
                 var responsePlanHeader = divResponsePlan.append("div")
-                        .attr("id", "responsePlanHeader")
-                        .style("text-align", "center")
-                        .style("height", "7%");
+                        .attr("id", "responsePlanHeader");
                 var responsePlanBody = divResponsePlan.append("div")
-                        .attr("id", "responsePlanBody")
-                        .style("height", "93%");
+                        .attr("id", "responsePlanBody");
                 responsePlanHeader.append("p")
-                        .text("Barrier of Mitigation Actions")
-                        .style("margin", "0px")
-                        .style("position", "relative")
-                        .style("top", "10px");
+                        .text("Response Plan");
                 var barrierDetailsArea = responsePlanBody.append("div")
-                        .attr("id", "barrierDetailsArea")
-                        .style("height", "100%");
+                        .attr("id", "barrierDetailsArea");
 
                 var barrierDetailsHeader = barrierDetailsArea.append("div")
-                        .attr("id", "barrierDetailsHeader")
-                        .attr("align", "left")
-                        .style("height", "35%")
-                        .style("width", "100%")
-                        .style("display", "table")
-                        .style("border-top-color", "white")
-                        .style("border-top-style", "dotted")
-                        .style("border-top-width", "1px");
+                        .attr("id", "barrierDetailsHeader");
                 var barrierDetailsBody = barrierDetailsArea.append("div")
-                        .attr("id", "barrierDetailsBody")
-                        .style("height", "65%")
-                        .style("border-color", "white")
-                        .style("border-style", "dotted")
-                        .style("border-width", "1px")
-                        .style("border-radius", "5px");
+                        .attr("id", "barrierDetailsBody");
+                var barrierDetailsHeaderResponsePlanContainer = barrierDetailsHeader.append("div")
+                        .attr("id", "barrierDetailsHeaderResponsePlanContainer")
+                        .attr("align", "left");
 
-                barrierDetailsHeader.append("div")
+                //================================
+
+                var summary = barrierDetailsHeaderResponsePlanContainer.append("div")
+                        .attr("id", "responsePlanSummary");
+                summary.append("text")
+                        .text("Status:");
+                summary.append("text")
+                        .attr("id", "responsePlanStatusPercent")
+                        .text("--%");
+                summary.append("text")
+                        .text("Start: --:-- --/--/----");
+                summary.append("text")
+                        .text("End: --:-- --/--/----");
+                var responsePlanData = barrierDetailsHeaderResponsePlanContainer.append("div")
+                        .attr("id", "responsePlanData");
+                responsePlanData.append("text")
+                        .attr("id", "responsePlanNodeIP")
+                        .text("Node IP: __.__.__");
+                responsePlanData.append("text")
+                        .attr("id", "responsePlanSourceSelectTitle")
+                        .text("Edge from: ");
+                responsePlanData.append("select")
+                        .attr("id", "responsePlanSourceSelect")
+                        .append("option")
+                        .text("select barrier");
+
+                var responsePlanDataButtonDiv = responsePlanData.append("div");
+                responsePlanDataButtonDiv.append("button")
+                        .text("Stop")
+                        .property("disabled", false);// m.mitigation.status == "failed" ? false : true);
+                responsePlanDataButtonDiv.append("button")
+                        .text("Apply")
+                        .property("disabled", false);// m.mitigation.status == "success" || m.mitigation.status == "inactive" ? false : true);
+                //=================================
+
+                var barrierDetailsHeaderBarrierContainer = barrierDetailsHeader.append("div")
+                        .attr("id", "barrierDetailsHeaderBarrierContainer")
+                        .attr("align", "left");
+                barrierDetailsHeaderBarrierContainer.append("div")
                         .style("width", "30%")
                         .style("height", "100%")
                         .attr("align", "center")
@@ -1732,47 +1876,37 @@
                         .style("border-color", "#7A7A7A")
                         .style("border-style", "solid")
                         .style("border-width", "1px")
-                        .style("border-radius", "5px")
-                        .style("width", "24px")
-                        .style("height", "120px")
+                        .style("border-radius", "2px")
+                        .style("width", "12px")
+                        .style("height", "60px")
                         .style("display", "table-cell")
                         .style("vertical-align", "middle")
                         .append("svg")
                         .attr("id", "barrierDetailsHeaderSVGforBarrier")
-                        .attr("width", "24px")
-                        .attr("height", "120px");
-                var detailsHeaderSummary = barrierDetailsHeader.append("div")
+                        .attr("width", "12px")
+                        .attr("height", "60px");
+                var detailsHeaderSummary = barrierDetailsHeaderBarrierContainer.append("div")
                         .attr("id", "barrierDetailsHeaderBarrierSummary")
-                        .style("height", "100%")
-                        .style("width", "100%")
-                        .attr("align", "center")
-                        .style("position", "relative")
-                        .style("top", "0");
+                        .attr("align", "center");
 
-                var div = detailsHeaderSummary.append("div")
-                        .style("height", "33%")
-                        .style("position", "relative")
-                        .append("div")
-                        .style("width", "80%")
-                        .style("height", "65%")
-                        .style("display", "table")
-                        .style("position", "relative")
-                        .style("top", "50%")
-                        .style("transform", "translateY(-50%)")
-                        .style("border-radius", "5px")
-                        .style("border-style", "solid")
-                        .style("border-width", "2px")
-                        .style("border-color", "white")
-                        .style("background-color", "red");
 
-                div.append("div")
-                        .style("width", "30%")
-                        .style("display", "table-cell")
-                        .style("vertical-align", "middle")
-                        .append("text")
-                        .attr("class", "barrierDetailsHeaderBarrierSummaryTitle")
-                        .style("margin-left", "10px")
-                        .text("Failed:");
+                var containerDiv = detailsHeaderSummary.append("div")
+                        .style("height", "50%")
+                        .attr("align", "center");
+
+                var div = containerDiv
+                        .append("span")
+                        .style("background-color", "red")
+                        .append("div");
+
+//                div.append("div")
+//                        .style("width", "30%")
+//                        .style("display", "table-cell")
+//                        .style("vertical-align", "middle")
+//                        .append("text")
+//                        .attr("class", "barrierDetailsHeaderBarrierSummaryTitle")
+//                        .style("margin-left", "10px")
+//                        .text("Failed:");
                 div.append("div")
                         .style("width", "50%")
                         .style("display", "table-cell")
@@ -1800,29 +1934,19 @@
                             filterBarrierDetailsBody(filterArray);
                         });
 //               ----------------------- 
-                var div = detailsHeaderSummary.append("div")
-                        .style("height", "33%")
-                        .append("div")
-                        .style("width", "80%")
-                        .style("height", "65%")
-                        .style("display", "table")
-                        .style("position", "relative")
-                        .style("top", "50%")
-                        .style("transform", "translateY(-50%)")
-                        .style("border-radius", "5px")
-                        .style("border-style", "solid")
-                        .style("border-width", "2px")
-                        .style("border-color", "white")
-                        .style("background-color", "green");
+                var div = containerDiv
+                        .append("span")
+                        .style("background-color", "green")
+                        .append("div");
 
-                div.append("div")
-                        .style("width", "20%")
-                        .style("display", "table-cell")
-                        .style("vertical-align", "middle")
-                        .append("text")
-                        .attr("class", "barrierDetailsHeaderBarrierSummaryTitle")
-                        .style("margin-left", "10px")
-                        .text("Success:");
+//                div.append("div")
+//                        .style("width", "20%")
+//                        .style("display", "table-cell")
+//                        .style("vertical-align", "middle")
+//                        .append("text")
+//                        .attr("class", "barrierDetailsHeaderBarrierSummaryTitle")
+//                        .style("margin-left", "10px")
+//                        .text("Success:");
                 div.append("div")
                         .style("width", "60%")
                         .style("display", "table-cell")
@@ -1850,29 +1974,19 @@
                             filterBarrierDetailsBody(filterArray);
                         });
 //               ----------------------- 
-                var div = detailsHeaderSummary.append("div")
-                        .style("height", "33%")
-                        .append("div")
-                        .style("width", "80%")
-                        .style("height", "65%")
-                        .style("display", "table")
-                        .style("position", "relative")
-                        .style("top", "50%")
-                        .style("transform", "translateY(-50%)")
-                        .style("border-radius", "5px")
-                        .style("border-style", "solid")
-                        .style("border-width", "2px")
-                        .style("border-color", "white")
-                        .style("background-color", "gray");
+                var div = containerDiv
+                        .append("span")
+                        .style("background-color", "gray")
+                        .append("div");
 
-                div.append("div")
-                        .style("width", "30%")
-                        .style("display", "table-cell")
-                        .style("vertical-align", "middle")
-                        .append("text")
-                        .attr("class", "barrierDetailsHeaderBarrierSummaryTitle")
-                        .style("margin-left", "10px")
-                        .text("Inactive:");
+//                div.append("div")
+//                        .style("width", "30%")
+//                        .style("display", "table-cell")
+//                        .style("vertical-align", "middle")
+//                        .append("text")
+//                        .attr("class", "barrierDetailsHeaderBarrierSummaryTitle")
+//                        .style("margin-left", "10px")
+//                        .text("Inactive:");
                 div.append("div")
                         .style("width", "50%")
                         .style("display", "table-cell")
@@ -1941,10 +2055,9 @@
                 queueSVG = [];
                 createChart(mostProbableAttackId);
                 createGraph(mostProbableAttackId, 1); // 1 means is an istantiateOnGoing graph
+                $(".bottomMenu").animate({scrollLeft: "0px"}, 100);
+                $(".bottomMenu").animate({scrollLeft: $("#attackPreview_" + mostProbableAttackId).position().left}, 300);
 
-                $(".bottomMenu").animate({scrollLeft: "0px"}, 100, function () {
-                    $(".bottomMenu").animate({scrollLeft: $("#attackPreview_" + mostProbableAttackId).position().left}, 300);
-                });
 
                 d3.select("#attackPreview_" + mostProbableAttackId)
                         .style("border-color", "red");
@@ -1954,7 +2067,7 @@
             function clearProbableAttack() {
                 d3.selectAll(".lineInstantiateOnGoingAttack").remove();
                 d3.select(".bottomMenu").selectAll(".attackPreview").style("border-color", "white");
-
+                $(".bottomMenu").animate({scrollLeft: "0px"}, 100);
             }
 
             function reactive() {
@@ -2067,7 +2180,10 @@
              */
             function createBarrier(barriers)
             {
-                d3.selectAll(".barrier").transition().attr("fill-opacity", 0.3).attr("stroke-opacity", 0.3);
+                d3.selectAll(".barrier")
+                        .style("fill-opacity", 0)
+                        .style("stroke-opacity", 0)
+                        .style("display", "none");
                 for (var j = 0; j < barriers.length; j++) {
                     var rectWidth = 12;
                     var rectHeight = 60;
@@ -2077,7 +2193,11 @@
                     //count mitigations from all attacks for every attack edge
                     var mitigations = {
                         actions: [],
-                        position: []};
+                        position: [],
+                        sourceNode: barriers[j].sourceNode,
+                        targetNode: barriers[j].targetNode,
+                        edgeId: barriers[j].edgeId
+                    };
                     for (var i = 0; i < barriers[j].barrierData.length; i++) {
                         mitigations.actions = mitigations.actions.concat(barriers[j].barrierData[i].barrier);
                     }
@@ -2098,7 +2218,7 @@
                             .each(function () {
                                 var l = this.getTotalLength();
                                 if (l < rectHeight * 1.9) {//if rectange doesnt fit line
-                                    rectHeight = l - rectStandoff - 11; //11 alerted node radius
+                                    rectHeight = l - rectStandoff - 8; //11 alerted node radius
                                     //smallEdgeShifting = 10;
                                 }
                                 var p1 = this.getPointAtLength(l - rectStandoff);
@@ -2118,7 +2238,7 @@
                     var heightScale = d3.scale.linear()
                             .domain([0, mitigations.actions.length])
                             .range([0, rectHeight]);
-                    var g = layer.append("g")
+                    var g = layer.select("#barriers").append("g")
                             .datum(mitigations)
                             .attr("class", "barrier")
                             .style("cursor", "pointer")
@@ -2181,7 +2301,7 @@
                                             //.ease("linear")
                                             .attr("transform", "translate("
                                                     + (offsetX + d.position.startPoint.x) + ","
-                                                    + (offsetY + d.position.startPoint.y) + ") scale(3)")
+                                                    + (offsetY + d.position.startPoint.y) + ") scale(2)")
                                             .each("end", function () {
                                                 $(this).animate({//hide
                                                     width: "toggle",
@@ -2193,25 +2313,16 @@
                                                         height: "toggle"
                                                     }, 10, function () {
                                                         d3.select(this).transition()
-                                                                .attr("transform", "translate(0,0) scale(2)")
+                                                                .attr("transform", "translate(0,0) scale(1)")
                                                                 .selectAll("rect")
                                                                 .attr("x", 0);
                                                     });
                                                 });
-
-                                                d3.select("#detailsHint")
-                                                        .style("height", "0")
-                                                        .style("display", "none");
-                                                mitigationsPreview(d.actions);
-
+                                                mitigationsPreview([d]);
                                             });
                                 }
                                 else {
                                     clearMitigationPreview();
-                                    d3.select("#detailsHint")
-                                            .style("height", "100%")
-                                            .style("display", "table");
-
                                     d.position.onEdgeFlag = true;
                                     $(this).animate({//hide
                                         width: "toggle",
@@ -2269,20 +2380,36 @@
 
             function mitigationsPreview(mitigations)
             {
+                d3.select("#detailsHint")
+                        .style("height", "0")
+                        .style("display", "none");
                 //count all states of mitifation action 
                 var success = 0;
                 var failed = 0;
-                for (var m = 0; m < mitigations.length; m++)
+                var allActions = [];
+                for (var i = 0; i < mitigations.length; i++) {
+                    allActions = allActions.concat(mitigations[i].actions); //we take all acrions brom all barriers
+                }
+                for (var m = 0; m < allActions.length; m++)
                 {
-                    if (mitigations[m].mitigation.status === "success")
+                    if (allActions[m].mitigation.status === "success")
                         success = success + 1;
-                    if (mitigations[m].mitigation.status === "failed")
+                    if (allActions[m].mitigation.status === "failed")
                         failed = failed + 1;
                 }
-                var inactive = mitigations.length - success - failed;
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueFail").text(failed + "/" + mitigations.length);
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueSuccess").text(success + "/" + mitigations.length);
-                d3.select("#barrierDetailsHeaderBarrierSummaryValueInactive").text(inactive + "/" + mitigations.length);
+                var inactive = allActions.length - success - failed;
+
+                d3.select("#responsePlanNodeIP").text("Node IP: " + mitigations[0].targetNode.name);///TODO:  common targetNode 
+                d3.select("#responsePlanStatusPercent").text(Math.round(success / allActions.length * 100) + "%");
+                d3.select("#responsePlanSourceSelectTitle").text(mitigations.length + (mitigations.length > 1 ? " edges" : " edge") + " from:");
+                for (var i = 0; i < mitigations.length; i++) {
+                    d3.select("#responsePlanSourceSelect").append("option")
+                            .text(mitigations[i].sourceNode.name)
+                            .property("value", mitigations[i].sourceNode);
+                }
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueFail").text(failed + "/" + allActions.length);
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueSuccess").text(success + "/" + allActions.length);
+                d3.select("#barrierDetailsHeaderBarrierSummaryValueInactive").text(inactive + "/" + allActions.length);
                 d3.select("#barrierDetailsHeaderBarrierSummary").selectAll("input")
                         .property("checked", true)
                         .property("disabled", false);
@@ -2293,7 +2420,7 @@
 
                 var detailsBody = d3.select("#barrierDetailsBody");
 
-                mitigations.forEach(function (m) {
+                allActions.forEach(function (m) {
 
                     var mititgationItem = {
                         m: m,
@@ -2443,6 +2570,7 @@
             }
 
             function clearMitigationPreview() {
+
                 d3.selectAll(".detailsItemDiv").remove();
                 d3.select("#barrierDetailsHeaderBarrierSummary").selectAll("input")
                         .property("checked", false)
@@ -2450,6 +2578,14 @@
                 d3.select("#barrierDetailsHeaderBarrierSummaryValueFail").text("--/---");
                 d3.select("#barrierDetailsHeaderBarrierSummaryValueSuccess").text("--/---");
                 d3.select("#barrierDetailsHeaderBarrierSummaryValueInactive").text("--/---");
+                d3.select("#responsePlanStatusPercent").text("--%");
+                d3.select("#responsePlanNodeIP").text("Node IP: __.__.__");
+                d3.select("#responsePlanSourceSelectTitle").text("Edge from: ");
+                d3.select("#responsePlanSourceSelect").selectAll("option").remove();
+
+                d3.select("#detailsHint")
+                        .style("height", "100%")
+                        .style("display", "table");
             }
 
             /** 
@@ -2493,7 +2629,7 @@
                                             createGraph(indexOfPreview, 3);
                                             setTimeout(function () {
                                                 drawMostProbableAttack(activeNode);
-                                            }, (duration - 0.1 * 3) / 3)
+                                            }, (duration - 0.1 * 3) / 3);
                                         });
                             });
                 }
