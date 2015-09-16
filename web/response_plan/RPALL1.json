@@ -1,0 +1,4431 @@
+[
+    {
+        "response-plan": [
+            {
+                "mitigation": {
+                    "ID": "m26",
+                    "name": "close port 80",
+                    "type": "mitigationaction-firewall",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.12",
+                        "target": "192.168.1.9"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m19",
+                    "name": "close port 8080",
+                    "type": "mitigationaction-firewall",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.12",
+                        "target": "192.168.1.9"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m20",
+                    "name": "close port 3654",
+                    "type": "mitigationaction-firewall",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.12",
+                        "target": "192.168.1.9"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m29",
+                    "name": "update rule",
+                    "type": "mitigationaction-patching",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.12",
+                        "target": "192.168.1.9"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m06",
+                    "name": "update rule",
+                    "type": "mitigationaction-patching",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.1.12",
+                        "target": "192.168.1.9"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m24",
+                    "name": "update router firmware",
+                    "type": "mitigationaction-patching",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.1.12",
+                        "target": "192.168.1.9"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m17",
+                    "name": "update router firmware",
+                    "type": "mitigationaction-patching",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.9",
+                        "target": "192.168.2.89"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m01",
+                    "name": "close port 20",
+                    "type": "mitigationaction-firewall",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.1.9",
+                        "target": "192.168.2.89"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m13",
+                    "name": "close port 80",
+                    "type": "mitigationaction-firewall",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.1.9",
+                        "target": "192.168.2.89"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m18",
+                    "name": "shutdown pc-54",
+                    "type": "mitigationaction-shutdown",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.9",
+                        "target": "192.168.2.89"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m31",
+                    "name": "update rule",
+                    "type": "mitigationaction-patching",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.1.9",
+                        "target": "192.168.2.89"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m02",
+                    "name": "close port 50",
+                    "type": "mitigationaction-firewall",
+                    "status": "failed",
+                    "edge": {
+                        "source": "192.168.1.9",
+                        "target": "192.168.2.89"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m22",
+                    "name": "shutdown pc-9",
+                    "type": "mitigationaction-shutdown",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.2.89",
+                        "target": "192.168.1.8"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m38",
+                    "name": "close port 44",
+                    "type": "mitigationaction-firewall",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.2.89",
+                        "target": "192.168.1.8"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m07",
+                    "name": "shutdown pc-98",
+                    "type": "mitigationaction-shutdown",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.2.89",
+                        "target": "192.168.1.8"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m30",
+                    "name": "close port 90",
+                    "type": "mitigationaction-firewall",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.2.89",
+                        "target": "192.168.1.8"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m32",
+                    "name": "update router firmware",
+                    "type": "mitigationaction-patching",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.2.89",
+                        "target": "192.168.1.8"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m03",
+                    "name": "shutdown pc-03",
+                    "type": "mitigationaction-shutdown",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.2.89",
+                        "target": "192.168.1.8"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m33",
+                    "name": "update router firmware",
+                    "type": "mitigationaction-patching",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.1.8",
+                        "target": "192.168.1.6"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m09",
+                    "name": "close port 65",
+                    "type": "mitigationaction-firewall",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.8",
+                        "target": "192.168.1.6"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m36",
+                    "name": "close port 80",
+                    "type": "mitigationaction-firewall",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.1.8",
+                        "target": "192.168.1.6"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m37",
+                    "name": "close port 3121",
+                    "type": "mitigationaction-firewall",
+                    "status": "inactive",
+                    "edge": {
+                        "source": "192.168.1.8",
+                        "target": "192.168.1.6"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m40",
+                    "name": "update router firmware",
+                    "type": "mitigationaction-patching",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.8",
+                        "target": "192.168.1.6"
+                    }
+                }
+            },
+            {
+                "mitigation": {
+                    "ID": "m28",
+                    "name": "shutdown connection",
+                    "type": "mitigationaction-shutdown",
+                    "status": "success",
+                    "edge": {
+                        "source": "192.168.1.8",
+                        "target": "192.168.1.6"
+                    }
+                }
+            }
+        ],
+        "response-planID": "rp09"
+    },{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m01",
+                "name": "close port 20",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m04",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m05",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m06",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m11",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m13",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m15",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m16",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m17",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m18",
+                "name": "shutdown pc-54",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m19",
+                "name": "close port 8080",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m20",
+                "name": "close port 3654",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m21",
+                "name": "close port 69",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m23",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m24",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m26",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m27",
+                "name": "close port 46",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m29",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.9"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp01"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m01",
+                "name": "close port 20",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.3.14"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m11",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m06",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.14",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m13",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m04",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m17",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m15",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m05",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m16",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m26",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m19",
+                "name": "close port 8080",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m27",
+                "name": "close port 46",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m20",
+                "name": "close port 3654",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m24",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m29",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m21",
+                "name": "close port 69",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m18",
+                "name": "shutdown pc-54",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m23",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+
+        {
+            "mitigation": {
+                "ID": "m40",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp02"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m11",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m06",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m13",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m17",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m15",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m05",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m16",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m26",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m19",
+                "name": "close port 8080",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m27",
+                "name": "close port 46",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m20",
+                "name": "close port 3654",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m24",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m29",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m01",
+                "name": "close port 20",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m21",
+                "name": "close port 69",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m18",
+                "name": "shutdown pc-54",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m04",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.2"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m23",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.2",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.4.19"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.4.19"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.4.19"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.4.19"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m40",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.4.19"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp03"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m11",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m13",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m05",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m26",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m19",
+                "name": "close port 8080",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m20",
+                "name": "close port 3654",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m16",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m24",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m29",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m01",
+                "name": "close port 20",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m27",
+                "name": "close port 46",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m21",
+                "name": "close port 69",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m06",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m18",
+                "name": "shutdown pc-54",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m15",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m04",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m17",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m23",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.1.8"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.8",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m40",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.3.3"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp04"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m11",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m15",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m05",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m16",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m26",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m19",
+                "name": "close port 8080",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m27",
+                "name": "close port 46",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m20",
+                "name": "close port 3654",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m06",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m24",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.3",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m29",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m01",
+                "name": "close port 20",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m13",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m17",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m21",
+                "name": "close port 69",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m18",
+                "name": "shutdown pc-54",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m23",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m04",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.5"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.5",
+                    "target": "192.168.1.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m40",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.4",
+                    "target": "192.168.1.17"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp05"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.15",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.15",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.15",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.15",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.15",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.15",
+                    "target": "192.168.1.16"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m04",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.16",
+                    "target": "192.168.1.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m23",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.17",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.1.9"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp06"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp07"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m15",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m11",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m05",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m19",
+                "name": "close port 8080",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m29",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.20",
+                    "target": "192.168.3.17"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m06",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.1"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m24",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.1"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m13",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.1"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.1"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.1"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m04",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.3.17",
+                    "target": "192.168.1.1"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.1",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m40",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.3.3"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp08"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp07"
+},{
+    "response-plan": [
+        {
+            "mitigation": {
+                "ID": "m14",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m25",
+                "name": "block ip address",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m08",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m10",
+                "name": "close port 18",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m22",
+                "name": "shutdown pc-9",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.13",
+                    "target": "192.168.1.12"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m07",
+                "name": "shutdown pc-98",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m30",
+                "name": "close port 90",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.12",
+                    "target": "192.168.4.3"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m38",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m31",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m02",
+                "name": "close port 50",
+                "type": "mitigationaction-firewall",
+                "status": "failed",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.4.3",
+                    "target": "192.168.2.4"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m33",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m28",
+                "name": "shutdown connection",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m34",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.4",
+                    "target": "192.168.2.89"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m37",
+                "name": "close port 3121",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m32",
+                "name": "update router firmware",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m03",
+                "name": "shutdown pc-03",
+                "type": "mitigationaction-shutdown",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.2.89",
+                    "target": "192.168.1.9"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m39",
+                "name": "update rule",
+                "type": "mitigationaction-patching",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m35",
+                "name": "close port 60",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m09",
+                "name": "close port 65",
+                "type": "mitigationaction-firewall",
+                "status": "success",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m36",
+                "name": "close port 80",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        },
+        {
+            "mitigation": {
+                "ID": "m12",
+                "name": "close port 44",
+                "type": "mitigationaction-firewall",
+                "status": "inactive",
+                "edge": {
+                    "source": "192.168.1.9",
+                    "target": "192.168.4.20"
+                }
+            }
+        }
+    ],
+    "response-planID": "rp07"
+}
+]
+

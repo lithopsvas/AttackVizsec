@@ -4,7 +4,7 @@
 <html>
 
     <head>
-        <meta name="viewport" content="initial-scale=0.7, user-scalable=no" />
+        <meta name="viewport" content="initial-scale=0.7" />
         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true"></script>
         <script type="text/javascript" src="javascript/d3.v2.js"></script>
         <script type="text/javascript" src="javascript/d3.tip.v0.6.3.js"></script>
@@ -19,7 +19,8 @@
     <body onload="
             createMap();">
 
-        <form style="position: absolute; 
+        <form id ="radioButtonsForm" 
+              style="position: absolute; 
               z-index: 1; 
               background-color: #3d3d3d; 
               color:#fff; 
@@ -31,6 +32,8 @@
             <input id="pro" type="radio" name="mode" value="proactive" onClick="proactive()" >Proactive
             <br>
             <input id="re" type="radio" name="mode" value="reactive" onClick="reactive(1)"  checked>Reactive
+
+
         </form> 
 
         <!--remove the elements in the map where -->
@@ -38,19 +41,78 @@
 
         <script type="text/javascript">
 
+            var h = parseInt(window.innerHeight),
+                    w = parseInt(window.innerWidth),
+                    mode = 1, //0=proactive, 1=reactive
+                    alertIndex = 0,
+                    overlay = 0,
+                    rightMenuVisible = true,
+                    bottomMenuVisible = true,
+                    leftMenuVisible = true,
+                    topMenuVisible = true,
+                    sizeLabel = 50,
+                    svgshifting = 2500,
+                    borderAttackPreview = 2,
+                    totalEdges = [],
+                    totalNode = [],
+                    totalAttacks = [],
+                    totalResponse = [],
+                    alertNodes = [
+                        "192.168.1.13",
+                        "192.168.1.12",
+                        "192.168.4.3",
+                        "192.168.2.4",
+                        "192.168.2.89",
+                        "192.168.1.9",
+                        "192.168.1.16",
+                        "192.168.1.1",
+                        "192.168.1.17"],
+                    subnetList = [],
+                    queueSVG = [],
+                    wRightMenu = w * 0.20,
+                    hBottomMenu = h * 0.25,
+                    width = wRightMenu,
+                    height = wRightMenu,
+                    mm = 0,
+                    originalPos = [],
+                    radius = Math.min(width, height) / 1.5,
+                    projection = 0,
+                    layer = 0,
+                    numberOfPreviewAttack = 5,
+                    rightMenu,
+                    leftMenu,
+                    bottomMenuContainer,
+                    topMenu,
+                    wAttackPreview = (w - borderAttackPreview * (numberOfPreviewAttack * 2)) / numberOfPreviewAttack,
+                    flagTable = 0,
+                    flagClickedNode = 0, //0 not clicked, 1 clicked
+                    lastClickedNode = "",
+                    array = ["#8dd3c7", "#bebada", "#80b1d3", "#fccde5", "#d9d9d9", "#bc80bd", "#ccebc5", "2035FF", "0AB26C"],
+                    color = d3.scale.ordinal().range(array),
+                    wMap = w - wRightMenu - w / 5, //w/5 is space in excess
+                    hMap = h - hBottomMenu,
+                    wSVGPreview = wAttackPreview,
+                    hPreviewHeaderDiv = 35,
+                    hSVGPreview = hBottomMenu - 30,
+                    nodeRadius = 7,
+                    currentPreviewIndex = 0;
+
             // Create the Google Map
             var map = new google.maps.Map(d3.select("#map").node(), {
                 zoom: 11,
-                center: new google.maps.LatLng(41.859307, 12.596115), //center of rome
+                center: new google.maps.LatLng(41.864832, 12.601916), //center of rome
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
-                disableDefaultUI: true
-//                zoomControlOptions: {
-//                    position: google.maps.ControlPosition.LEFT_TOP,
-//                    style: google.maps.ZoomControlStyle.LARGE
-//                }
-                        //draggable : false
+                streetViewControl: false,
+                panControl: false,
+                mapTypeControl: false,
+                zoomControl: true,
+                zoomControlOptions: {
+                    style: google.maps.ZoomControlStyle.SMALL,
+                    position: google.maps.ControlPosition.LEFT_CENTER
+                }
+
             });
-            var currentPreviewIndex = 0;
+
             var styles = [[
                     {
                         "featureType": "road",
@@ -105,13 +167,18 @@
                             {"visibility": "off"}
                         ]
                     }, {
-                        zoomControlOptions: {
-                            position: google.maps.ControlPosition.LEFT_TOP,
-                            style: google.maps.ZoomControlStyle.LARGE
-                        }
+//                        zoomControlOptions: {
+//                            position: google.maps.ControlPosition.LEFT_CENTER,
+//                            style: google.maps.ZoomControlStyle.SMALL
+//                        }
                     }
                 ]];
             map.setOptions({styles: styles[1]});
+//            google.maps.event.addDomListener(map, 'tilesloaded', function () {
+//                if ($('#zoomPos').length == 0) {
+//                    $('div.gmnoprint').last().parent().wrap('<div id="zoomPos" />');
+//                }
+//            });
 
             //redraw function on zoom
             google.maps.event.addListener(map, 'zoom_changed', function () {
@@ -194,57 +261,6 @@
                 }, 1000);
             });
 
-            var h = parseInt(window.innerHeight),
-                    w = parseInt(window.innerWidth),
-                    mode = 1, //0=proactive, 1=reactive
-                    alertIndex = 0,
-                    overlay = 0,
-                    sideMenuVisible = true,
-                    bottomMenuVisible = true,
-                    sizeLabel = 50,
-                    svgshifting = 2500,
-                    borderAttackPreview = 2,
-                    totalEdges = [],
-                    totalNode = [],
-                    totalAttacks = [],
-                    totalResponse = [],
-                    alertNodes = [
-                        "192.168.1.13",
-                        "192.168.1.12",
-                        "192.168.4.3",
-                        "192.168.2.4",
-                        "192.168.2.89",
-                        "192.168.1.9",
-                        "192.168.1.16",
-                        "192.168.1.1",
-                        "192.168.1.17"],
-                    subnetList = [],
-                    queueSVG = [],
-                    wSideMenu = w * 0.20,
-                    hBottomMenu = h * 0.3,
-                    width = wSideMenu,
-                    height = wSideMenu,
-                    mm = 0,
-                    originalPos = [],
-                    radius = Math.min(width, height) / 1.5,
-                    projection = 0,
-                    layer = 0,
-                    numberOfPreviewAttack = 5,
-                    sideMenu,
-                    bottomMenuContainer,
-                    wAttackPreview = (w - borderAttackPreview * (numberOfPreviewAttack * 2)) / numberOfPreviewAttack,
-                    flagTable = 0,
-                    flagClickedNode = 0, //0 not clicked, 1 clicked
-                    lastClickedNode = "",
-                    array = ["#8dd3c7", "#bebada", "#80b1d3", "#fccde5", "#d9d9d9", "#bc80bd", "#ccebc5", "2035FF", "0AB26C"],
-                    color = d3.scale.ordinal().range(array),
-                    wMap = w - wSideMenu - w / 5, //w/5 is space in excess
-                    hMap = h - hBottomMenu,
-                    wSVGPreview = wAttackPreview,
-                    hPreviewHeaderDiv = 35,
-                    hSVGPreview = hBottomMenu - 30,
-                    nodeRadius = 7;
-
             document.getElementById('re').checked = true;
             // Load the station data. When the data comes back, create an overlay.
 
@@ -260,21 +276,23 @@
 
                 });
 
-                d3.json("response_plan/RPALL.json", function (data)
+                d3.json("response_plan/RPALL1.json", function (data)
                 {
                     totalResponse = data;
                 });
 //                for (var index = 0; index <= 8; index++) {
-                d3.json("json attack/attackALL.json", function (source) {
+                d3.json("json attack/attackALL1.json", function (source) {
                     totalAttacks = source;
                 });
 //                }
             }
 
             function initializeInterface() {
-                createSideMenu();
+                createRightMenu();
+                createLeftMenu();
                 createBottomMenu();
-                removeElements();
+                createTopMenu();
+                //removeElements();
             }
 
             function createMap() {
@@ -374,6 +392,18 @@
                                 .attr("orient", "auto")
                                 .append("svg:path")
                                 .attr("d", "M0,-5L10,0L0,5");
+                        layer.append("svg:defs").append("svg:marker")
+                                .attr("id", "socialNetworkArcMarker")
+                                .attr("viewBox", "0 -5 10 10")
+                                .attr("refX", nodeRadius + 8)
+                                .attr("refY", 0)
+                                .attr("markerUnits", "userSpaceOnUse")
+                                .attr("markerWidth", 18)
+                                .attr("markerHeight", 20)
+                                .attr("orient", "auto")
+                                .append("svg:path")
+                                .attr("d", "M0,-5L10,0L0,5");
+
                         d3.selectAll(".line").remove();
                         d3.selectAll(".barrier").remove();
                         d3.selectAll(".nodeBarrier").remove();
@@ -467,7 +497,7 @@
                                             .transition()
                                             .duration(200)
                                             .style("fill-opacity", "1")
-                                            .style("stroke-opacity", "1")
+                                            .style("stroke-opacity", "1");
                                     d3.selectAll(".barrier")
                                             .filter(function (barrier) {
                                                 return barrier.targetNode == node && d3.selectAll("#" + barrier.edgeId)[0].length == 0;
@@ -505,7 +535,7 @@
                                             })
                                             .each(function (barrier) {
                                                 mitigations.push(barrier);
-                                            })
+                                            });
                                     if (mitigations.length > 0)
                                         mitigationsPreview(mitigations);
                                 });
@@ -586,38 +616,29 @@
                 };
                 // Bind our overlay to the map
                 overlay.setMap(map);
-                setTimeout("drawPreviews()", 1000);
+                setTimeout("drawInterface()", 500);
             }
 
-            function drawPreviews() {
+            function drawInterface() {
 //                console.log("originalPos:");
 //                console.log(originalPos);
-//                console.log("totalAttacks:");
-//                console.log(totalAttacks);
-//                console.log("totalEdges");
-//                console.log(totalEdges);
-//                console.log("totalNode");
-//                console.log(totalNode);
+                console.log("totalAttacks:");
+                console.log(totalAttacks);
+                console.log("totalEdges");
+                console.log(totalEdges);
+                console.log("totalNode");
+                console.log(totalNode);
 //                console.log("totalResponse");
 //                console.log(totalResponse);
-
                 drawDonutChart();
                 drawButtons();
-                //var time = 3000;
-                if (mode == 0)
-                {
-                    var time = 0;
-                    for (var indexOfPreview = 0; indexOfPreview < 9; indexOfPreview++) {
-                        var myVar = setTimeout("drawPreview(" + indexOfPreview + ")", time);
-                        time = time + 100;
-                    }
-                }
-                else
-                {
-                    for (var indexOfPreview = 0; indexOfPreview < 9; indexOfPreview++) {
-                        drawPreview(indexOfPreview);
-                    }
-                }
+                drawPreviews();
+                d3.select(".leftMenuLabel").transition().delay(1000).each(function (d, i) {
+                    d3.select(this).on("click").apply(this, [d, i]);
+                });
+                d3.select(".topMenuLabel").transition().delay(2000).each(function (d, i) {
+                    d3.select(this).on("click").apply(this, [d, i]);
+                });
             }
 
             function removeElements() {
@@ -627,13 +648,14 @@
             }
 
             function removeAllElements() {
-                d3.selectAll(".gmnoprint").remove();
-                d3.select(".gm-style-cc").remove();
+                //d3.selectAll(".gmnoprint").remove();
+                //d3.select(".gm-style-cc").remove();
                 d3.select("a").remove();
                 d3.selectAll(".perimeterArc").remove();
                 d3.selectAll(".lineStaticAttack").remove();
                 d3.selectAll(".lineInstantiateAttack").remove();
                 d3.selectAll(".lineInstantiateOnGoingAttack").remove();
+                d3.selectAll(".socialNetworkArc").remove();
                 d3.selectAll(".barrier").remove();
                 //reset all lines
                 d3.selectAll(".line").style("opacity", 0.1);
@@ -719,32 +741,69 @@
                 return false;
             }
 
-            function createSideMenu() {
-                sideMenu = d3.select("body").append("div").attr("class", "sideMenu")
+            function createRightMenu() {
+                rightMenu = d3.select("body").append("div").attr("class", "rightMenu")
                         .style("height", h + "px")
-                        .style("width", wSideMenu + "px")
+                        .style("width", wRightMenu + "px")
                         .style("position", "absolute")
                         .style("top", "0px")
                         .style("right", "0px");
-                sideMenu.append("svg").attr("class", "sideMenuLabel")
+                rightMenu.append("svg").attr("class", "rightMenuLabel")
                         .style("position", "absolute")
                         .style("top", "0px")
                         .style("left", -sizeLabel - 2 + "px")
                         .style("height", sizeLabel + "px")
                         .style("width", sizeLabel + "px")
                         .on("click", function () {
-                            if (sideMenuVisible) {
-                                sideMenu.transition().style("right", -wSideMenu + "px").duration(500);
-                                bottomMenuContainer.transition().duration(500).style("width", w + "px");
-                                sideMenuVisible = false;
+                            if (rightMenuVisible) {
+                                rightMenu.transition().style("right", -wRightMenu + "px").duration(500).each("end", function () {
+                                    bottomMenuContainer.transition().duration(500).style("width", w + "px");
+                                });
+                                rightMenuVisible = false;
+
                             } else {
-                                sideMenu.transition().duration(500).style("right", "0px");
-                                bottomMenuContainer.transition().duration(500).style("width", w - wSideMenu + "px");
-                                sideMenuVisible = true;
+                                rightMenu.transition().duration(500).style("right", "0px");
+                                bottomMenuContainer.transition().duration(500).style("width", w - wRightMenu + "px");
+                                rightMenuVisible = true;
                             }
                         })
                         .style("background-color", "#3d3d3d");
-                var div = sideMenu.append("div")
+                rightMenu.append("div")
+                        .attr("id", "buttonsDiv")
+                        .style("position", "relative")
+                        .style("width", width)
+                        .style("height", "30px")
+                        .style("text-align", "center")
+                        .style("background-color", "#3d3d3d");
+
+                drawResponsePlanPreview();
+            }
+
+            function createLeftMenu() {
+                leftMenu = d3.select("body").append("div").attr("class", "leftMenu")
+                        .style("height", h + "px")
+                        .style("width", wRightMenu + "px")
+                        .style("position", "absolute")
+                        .style("top", "60px")
+                        .style("left", "0px");
+                leftMenu.append("svg").attr("class", "leftMenuLabel")
+                        .style("position", "absolute")
+                        .style("top", "0px")
+                        .style("right", -sizeLabel - 2 + "px")
+                        .style("height", sizeLabel + "px")
+                        .style("width", sizeLabel + "px")
+                        .on("click", function () {
+                            if (leftMenuVisible) {
+                                leftMenu.transition().duration(500).style("left", -wRightMenu + "px");
+                                leftMenuVisible = false;
+                            }
+                            else {
+                                leftMenu.transition().duration(500).style("left", "0px");
+                                leftMenuVisible = true;
+                            }
+                        })
+                        .style("background-color", "#3d3d3d");
+                var div = leftMenu.append("div")
                         .attr("id", "donutChartDiv")
                         .style("position", "relative")
                         .style("height", height)
@@ -756,21 +815,14 @@
                         .attr("height", height)
                         .append("g")
                         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-                sideMenu.append("div")
+                leftMenu.append("div")
                         .attr("class", "tableAttack")
-                        .style("left", (wSideMenu / 3 - (radius / 8)) + "px")
+                        .style("left", (wRightMenu / 3 - (radius / 8)) + "px")
                         .style("top", height * 0.4 / 2 + "px")
                         .style("width", 5 * radius / 8 + "px") //radius/2 for rect lenght + radius/8 for shifting when mouseover on arc
                         .style("height", height * 0.6 + "px")
                         .style("max-height", height * 0.6 + "px");
-                sideMenu.append("div")
-                        .attr("id", "buttonsDiv")
-                        .style("position", "relative")
-                        .style("width", width)
-                        .style("text-align", "center")
-                        .style("background-color", "#3d3d3d");
 
-                drawResponsePlanPreview();
             }
 
             //creates bottom menu and associates for each div a svg
@@ -778,7 +830,7 @@
                 bottomMenuContainer = d3.select("body").append("div")
                         .attr("class", "bottomMenuContainer")
                         .style("height", hBottomMenu + "px")
-                        .style("width", w - wSideMenu + "px")
+                        .style("width", w - wRightMenu + "px")
                         .style("position", "absolute")
                         .style("bottom", "0px")
                         .style("left", "0px");
@@ -801,8 +853,141 @@
                 bottomMenuContainer.append("div")
                         .attr("class", "bottomMenu")
                         .style("height", hBottomMenu + "px")
-                        .style("width","100%")
+                        .style("width", "100%")
                         .attr("align", "left");
+            }
+
+            function createTopMenu() {
+                topMenu = d3.select("body").append("div")
+                        .attr("class", "topMenu")
+                        .style("height", 2*hBottomMenu + "px")
+                        .style("width", w - wRightMenu - 200 + "px")
+                        .style("position", "absolute")
+                        .style("top", "0px")
+                        .style("left", "100px");
+                topMenu.append("svg").attr("class", "topMenuLabel")
+                        .style("position", "absolute")
+                        .style("bottom", -sizeLabel - 2 + "px")
+                        .style("height", sizeLabel + "px")
+                        .style("width", sizeLabel + "px")
+                        .on("click", function () {
+                            if (topMenuVisible) {
+                                topMenu.transition().duration(500).style("top", -2*hBottomMenu + "px");
+                                topMenuVisible = false;
+                            } else {
+                                topMenu.transition().duration(500).style("top", "0px");
+                                topMenuVisible = true;
+                            }
+                        })
+                        .style("background-color", "#3d3d3d");
+
+                topMenu.append("div")
+                        .attr("id", "parallelCoordinates")
+                        .style("height", d3.select(".topMenu").node().getBoundingClientRect().height-2+"px")
+                        .style("width", "100%")
+                        .attr("align", "left")
+                        //.style("background-color", "white")
+                .style("background-color", "#3d3d3d");
+                drawParallelCoordinates();
+            }
+
+            function drawParallelCoordinates() {
+                var margin = {top: 40, right: 10, bottom: 40, left: 10},
+                width = d3.select("#parallelCoordinates").node().getBoundingClientRect().width - margin.left - margin.right,
+                        height = d3.select("#parallelCoordinates").node().getBoundingClientRect().height - margin.top - margin.bottom;
+                var x = d3.scale.ordinal().rangePoints([0, width], 1),
+                        y = {};
+
+                var line = d3.svg.line(),
+                        axis = d3.svg.axis().orient("left"),
+                        background,
+                        foreground;
+
+                var svg = d3.select("#parallelCoordinates").append("svg")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                d3.csv("riskParameters.csv", function (error, cars) {
+                    // Extract the list of dimensions and create a scale for each.
+                    x.domain(dimensions = d3.keys(cars[0]).filter(function (d) {
+                        return d != "response plan ID" && (y[d] = d3.scale.linear()
+                                .domain(d3.extent(cars, function (p) {
+                                    return +p[d];
+                                }))
+                                .range([height, 0]));
+                    }));
+                    // Add grey background lines for context.
+                    background = svg.append("g")
+                            .attr("class", "background")
+                            .selectAll("path")
+                            .data(cars)
+                            .enter().append("path")
+                            .attr("d", path);
+
+                    // Add blue foreground lines for focus.
+                    foreground = svg.append("g")
+                            .attr("class", "foreground")
+                            .selectAll("path")
+                            .data(cars)
+                            .enter().append("path")
+                            .attr("d", path);
+
+                    // Add a group element for each dimension.
+                    var g = svg.selectAll(".dimension")
+                            .data(dimensions)
+                            .enter().append("g")
+                            .attr("class", "dimension")
+                            .attr("transform", function (d) {
+                                return "translate(" + x(d) + ")";
+                            });
+
+                    // Add an axis and title.
+                    g.append("g")
+                            .attr("class", "axis")
+                            .each(function (d) {
+                                d3.select(this).call(axis.scale(y[d]));
+                            })
+                            .append("text")
+                            .style("text-anchor", "middle")
+                            .attr("y", -9)
+                            .text(function (d) {
+                                return d;
+                            });
+
+                    // Add and store a brush for each axis.
+                    g.append("g")
+                            .attr("class", "brush")
+                            .each(function (d) {
+                                d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brush", brush));
+                            })
+                            .selectAll("rect")
+                            .attr("x", -8)
+                            .attr("width", 16);
+                });
+
+                // Returns the path for a given data point.
+                function path(d) {
+                    return line(dimensions.map(function (p) {
+                        return [x(p), y[p](d[p])];
+                    }));
+                }
+
+                // Handles a brush event, toggling the display of foreground lines.
+                function brush() {
+                    var actives = dimensions.filter(function (p) {
+                        return !y[p].brush.empty();
+                    }),
+                            extents = actives.map(function (p) {
+                                return y[p].brush.extent();
+                            });
+                    foreground.style("display", function (d) {
+                        return actives.every(function (p, i) {
+                            return extents[i][0] <= d[p] && d[p] <= extents[i][1];
+                        }) ? null : "none";
+                    });
+                }
             }
 
             function drawPreviewGraph(index, svg) {
@@ -851,13 +1036,17 @@
                         .attr("transform", "translate(" + (wSVGPreview - 75) + "," + (hPreviewHeaderDiv + 20) + ")");
                 g.append("text")
                         .attr("class", "textPreview")
-                        .text("Length: " + graphAttack.length);
+                        .text("Prob.: " + totalAttacks[index].probability);
                 g.append("text")
                         .attr("transform", "translate(0," + 20 + ")")
                         .attr("class", "textPreview")
+                        .text("Length: " + graphAttack.length)
+                g.append("text")
+                        .attr("transform", "translate(0," + 40 + ")")
+                        .attr("class", "textPreview")
                         .text("Legend:");
                 var g1 = g.append("g")
-                        .attr("transform", "translate(0," + 40 + ")");
+                        .attr("transform", "translate(0," + 60 + ")");
                 g1.append("text")
                         .attr("class", "textPreview")
                         .text("Source:");
@@ -874,7 +1063,7 @@
                         .attr("cy", -5)
                         .style("fill", "black");
                 var g2 = g.append("g")
-                        .attr("transform", "translate(0," + 60 + ")");
+                        .attr("transform", "translate(0," + 80 + ")");
                 g2.append("text")
                         .attr("class", "textPreview")
                         .text("Target:");
@@ -1304,6 +1493,10 @@
                         id = "perimeterArc";
                         radiusMagnifier = 0;
                         break;
+                    case 4:
+                        id = "socialNetworkArc";
+                        radiusMagnifier = 1.5;
+                        break;
                 }
                 var lines = {
                     edges: [],
@@ -1311,20 +1504,37 @@
                     radiusMagnifier: radiusMagnifier
                 };
                 if (type == 0) {
+                    var maxProbability = 0;
+                    totalAttacks.forEach(function (d) {
+                        if (d.probability > maxProbability)
+                            maxProbability = d.probability;
+                    });
+                    var scaleStrokeWidth = d3.scale.linear()
+                            .domain([0, maxProbability])
+                            .range([0, 6]);
+//                    totalAttacks[attackIndex].attack.forEach(function (attackEdge) {
+//                        totalNode.forEach(function (sourceNode) {
+//                            if (sourceNode.name == attackEdge.source.name) {
+//                                totalNode.forEach(function (targetNode) {
+//                                    if (targetNode.name == attackEdge.target.name)
+//                                        lines.edges.push({
+//                                            source: sourceNode,
+//                                            target: targetNode,
+//                                            edgeId: id + attackIndex,
+//                                            strokeWidth: scaleStrokeWidth(totalAttacks[attackIndex].probability)
+//                                        });
+//                                });
+//                            }
+//                        });
+//                    });
                     totalAttacks[attackIndex].attack.forEach(function (attackEdge) {
-                        totalNode.forEach(function (sourceNode) {
-                            if (sourceNode.name == attackEdge.source.name) {
-                                totalNode.forEach(function (targetNode) {
-                                    if (targetNode.name == attackEdge.target.name)
-                                        lines.edges.push({
-                                            source: sourceNode,
-                                            target: targetNode,
-                                            edgeId: id + attackIndex,
-                                            strokeWidth: stroke
-                                        });
-                                });
-                            }
-                        });
+                        if (attackEdge.target.name != "x")
+                            lines.edges.push({
+                                source: getNode(attackEdge.source.name),
+                                target: getNode(attackEdge.target.name),
+                                edgeId: id + attackIndex,
+                                strokeWidth: scaleStrokeWidth(totalAttacks[attackIndex].probability)
+                            });
                     });
                     drawGraph(lines);
                 }
@@ -1373,7 +1583,6 @@
                 else if (type == 3) {
 
                     d3.selectAll(".perimeterArc").remove();
-                    d3.selectAll(".line").style("opacity", 0.1);
                     var activeNode = alertNodes[attackIndex];
                     var barriers = [];
                     //Active attack predicted edges which are then covered by barriers  
@@ -1381,12 +1590,10 @@
 
                     for (var h = 0; h < totalAttacks.length; h++)//for all attacs
                     {
-
-                        for (var k = 0; k < totalAttacks[h].attack.length; k++)//for each attack path in attack
+                        outerloop:
+                                for (var k = 0; k < totalAttacks[h].attack.length; k++)//for each attack path in attack
                         {
-                            outerloop:
-
-                                    if (totalAttacks[h].attack[k].source.name === activeNode)//if attack path goes from our activeNode 
+                            if (totalAttacks[h].attack[k].source.name === activeNode)//if attack path goes from our activeNode 
                             {
 //                                var noEdge = true;
 //                                totalEdges.forEach(function (edge) {
@@ -1444,6 +1651,7 @@
                     lines.edges.forEach(function (d) {
                         d.strokeWidth = scaleStrokeWidth(d.attacksId.length);
                     });
+
                     drawGraph(lines);
                     createBarrier(barriers);
                     //hightlight outgoing links
@@ -1453,8 +1661,99 @@
                             //.style("stroke-width", "5px")
                             .style("opacity", "0.5");
                 }
-                //TODO: delete getAttackArray(lines);
-                //var ap = getAttackArray(lines);  //contains the attack path in the form of an array of nodes
+                else if (type == 4) {
+                    var barriers = [];
+                    var activeNode = "192.168.1.13";
+
+                    attackloop:
+                            for (var h = 0; h < totalAttacks.length; h++)//for all attacs
+                    {
+                        if (totalAttacks[h].attack[0].source.name != activeNode) {//if attack path does not go from our activeNode 
+                            continue attackloop;
+                        }
+                        pathloop:
+                                for (var k = 0; k < totalAttacks[h].attack.length; k++)//for each attack path in attack
+                        {
+
+                            var s = totalAttacks[h].attack[k].source.name;
+                            var t = totalAttacks[h].attack[k].target.name;
+                            var mitigationActions = computeBarrier(h, s, t);
+                            var barrierData = {
+                                attackId: h,
+                                barrier: mitigationActions
+                            };
+                            for (var i = 0; i < lines.edges.length; i++) {//for all activeAttackEdges
+                                if (totalAttacks[h].attack[k].source.name == lines.edges[i].source.name && totalAttacks[h].attack[k].target.name == lines.edges[i].target.name) {//We see if there exsist the same edge in our lines
+                                    //we only add mitigations to the existing edge
+                                    barriers[i].barrierData.push(barrierData);
+                                    lines.edges[i].totalProbability += parseFloat(totalAttacks[h].probability);
+                                    continue pathloop; //to skip adding new new edge to lines
+                                }
+                            }
+                            //if there is no edge, we add new new edge to lines
+                            if (totalAttacks[h].attack[k].target.name != "x") { //if not the last node though
+                                lines.edges.push({
+                                    source: getNode(s),
+                                    target: getNode(t),
+                                    edgeId: id + replacePoints(s) + "-" + replacePoints(t),
+                                    strokeWidth: 2,
+                                    totalProbability: parseFloat(totalAttacks[h].probability)
+                                });
+                                barriers.push({
+                                    edgeId: id + replacePoints(s) + "-" + replacePoints(t),
+                                    sourceNode: getNode(s),
+                                    targetNode: getNode(t),
+                                    barrierData: [barrierData],
+                                    barrierPosition: []
+                                });
+
+                            }
+                        }
+                    }
+                    //update stroke widths on base of number attacks going through the edge
+                    var maxProbability = 0;
+                    lines.edges.forEach(function (d) {
+                        if (d.totalProbability > maxProbability)
+                            maxProbability = d.totalProbability;
+                    });
+                    var scaleStrokeWidth = d3.scale.linear()
+                            .domain([0, .5, .51, maxProbability])
+                            .range([0, 0, 3, 12]);
+                    lines.edges.forEach(function (d) {
+                        console.log(d.totalProbability);
+                        d.strokeWidth = scaleStrokeWidth(d.totalProbability);
+                    });
+                    var maxBarriers = 0;
+                    barriers.forEach(function (barrier) {
+                        if (barrier.barrierData.length > maxBarriers)
+                            maxBarriers = barrier.barrierData.length;
+                    });
+                    var scaleRadius = d3.scale.linear()
+                            .domain([1, maxBarriers])
+                            .range([nodeRadius, 20]);
+                    barriers.forEach(function (barrier) {
+                        d3.selectAll(".node")
+                                .filter(function (node) {
+                                    return node.name == barrier.targetNode.name;
+                                })
+                                .select("circle")
+                                .attr("r", scaleRadius(barrier.barrierData.length))
+                                .style("fill", "#f00")
+                                .attr("stroke", "#3d3d3d")
+                                .attr("stroke-width", "1px");
+                    });
+                    d3.selectAll(".node")
+                            .filter(function (node) {
+                                return node.name == activeNode;
+                            })
+                            .select("circle")
+                            .attr("r", 10)
+                            .style("fill", "yellow")
+                            .attr("stroke", "#3d3d3d")
+                            .attr("stroke-width", "2px");
+                    drawGraph(lines);
+                    //createBarrier(barriers);
+                }
             }
 
 
@@ -1495,7 +1794,10 @@
                         .style("stroke-width", function (d) {
                             return d.strokeWidth;
                         })
-                        .attr("marker-end", "url(#" + lines.class + "Marker)");
+                        .attr("marker-end", function (d) {
+                            if (d.strokeWidth > 0)
+                                return "url(#" + lines.class + "Marker)";
+                        });
             }
 
             function computeBarrier(index, s, t)
@@ -1576,17 +1878,17 @@
                         graphAttack = [],
                         lines = [];
                 var arc = d3.svg.arc()
-                        .outerRadius(radius - wSideMenu * 0.23)
-                        .innerRadius(radius - wSideMenu * 0.28);
+                        .outerRadius(radius - wRightMenu * 0.23)
+                        .innerRadius(radius - wRightMenu * 0.28);
                 var arcOver = d3.svg.arc()
-                        .outerRadius(radius - wSideMenu * 0.2)
-                        .innerRadius(radius - wSideMenu * 0.31);
+                        .outerRadius(radius - wRightMenu * 0.2)
+                        .innerRadius(radius - wRightMenu * 0.31);
                 var arcAttack = d3.svg.arc()
-                        .outerRadius((radius - wSideMenu * 0.275) - 2)
-                        .innerRadius(radius - wSideMenu * 0.32);
+                        .outerRadius((radius - wRightMenu * 0.275) - 2)
+                        .innerRadius(radius - wRightMenu * 0.32);
                 /*var arcAttack = d3.svg.arc()
-                 .outerRadius(radius - wSideMenu * 0.175)
-                 .innerRadius(radius - wSideMenu * 0.275);*/
+                 .outerRadius(radius - wRightMenu * 0.175)
+                 .innerRadius(radius - wRightMenu * 0.275);*/
 
                 var pie = d3.layout.pie()
                         .sort(null)
@@ -1643,7 +1945,7 @@
                             })
                                     .transition()
                                     .duration(500)
-                                    .style("opacity", 0.2)
+                                    .style("opacity", 0.1)
                                     .style("stroke", "#000");
                         });
                 g.append("path")
@@ -1665,10 +1967,10 @@
                             if (attackNode.length != 0) {
                                 if (attackNode[0].length != 0) {
                                     var ratio = 1 - (attackNode[0].length / d.value);
-                                    var initArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wSideMenu * 0.2) + 2)
-                                            .innerRadius((radius - wSideMenu * 0.2) + 2);
-                                    var endArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wSideMenu * 0.2) + 2)
-                                            .innerRadius(radius - wSideMenu * 0.175);
+                                    var initArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wRightMenu * 0.2) + 2)
+                                            .innerRadius((radius - wRightMenu * 0.2) + 2);
+                                    var endArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wRightMenu * 0.2) + 2)
+                                            .innerRadius(radius - wRightMenu * 0.175);
                                     var data = [];
                                     data.push({
                                         init: initArc,
@@ -1716,8 +2018,8 @@
                             //var ratio=1;
                             if (a != null) {
                                 var ratio = 1 - (attackNode[0].length / d.value);
-                                var initArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wSideMenu * 0.2) + 2)
-                                        .innerRadius((radius - wSideMenu * 0.2) + 2);
+                                var initArc = d3.svg.arc().startAngle(a.__data__.startAngle + (a.__data__.endAngle - a.__data__.startAngle) * ratio).endAngle(a.__data__.endAngle).outerRadius((radius - wRightMenu * 0.2) + 2)
+                                        .innerRadius((radius - wRightMenu * 0.2) + 2);
                                 tempArc.transition().duration(500).attr("d", initArc).each("end", function () {
 
                                     d3.select(d3.select(this).node().parentNode).selectAll("#tempArc").remove();
@@ -1757,8 +2059,8 @@
 
                 var divButtons = d3.select("#buttonsDiv");
                 divButtons.append("button")
-                        .style("width", 70 + "px")
-                        .style("height", 25 + "px")
+                        .style("width", "30%")
+                        .style("height", "100%")
                         .text("Play 0")
                         .on("click", function () {
                             if (currentPreviewIndex == -1) {
@@ -1776,8 +2078,8 @@
                                 d3.select(this).text("Play " + currentPreviewIndex);
                         });
                 divButtons.append("button")
-                        .style("width", 70 + "px")
-                        .style("height", 25 + "px")
+                        .style("width", "30%")
+                        .style("height", "100%")
                         .text("Play all")
                         .on("click", function () {
                             currentPreviewIndex = 0;
@@ -1792,8 +2094,8 @@
                             }
                         });
                 divButtons.append("button")
-                        .style("width", 70 + "px")
-                        .style("height", 25 + "px")
+                        .style("width", "30%")
+                        .style("height", "100%")
                         .text("Reset")
                         .on("click", function () {
                             //location.reload();
@@ -1804,9 +2106,9 @@
 
             function drawResponsePlanPreview() {
                 var filterArray = [1, 1, 1];
-                var divResponsePlan = sideMenu.append("div")
+                var divResponsePlan = rightMenu.append("div")
                         .attr("id", "responsePlanDiv")
-                        .style("height", h - height - 25 - 5 * 3 - 30 + "px")
+                        .style("height", h - 32 - 5 * 5 + "px")
                         .style("background-color", "#3d3d3d");
                 var responsePlanHeader = divResponsePlan.append("div")
                         .attr("id", "responsePlanHeader");
@@ -2032,7 +2334,6 @@
 
             function removeGraphAndChart(index) {
                 //reset all lines
-                d3.selectAll(".line").style("opacity", 0.2);
                 layer.selectAll("#lineStaticAttack" + index).remove();
                 d3.select("#svgTable_" + index).remove();
             }
@@ -2066,6 +2367,7 @@
 
             function clearProbableAttack() {
                 d3.selectAll(".lineInstantiateOnGoingAttack").remove();
+                layer.selectAll(".line").style("opacity", "0.1");
                 d3.select(".bottomMenu").selectAll(".attackPreview").style("border-color", "white");
                 $(".bottomMenu").animate({scrollLeft: "0px"}, 100);
             }
@@ -2078,76 +2380,78 @@
             function proactive() {
                 mode = 0;
                 removeAllElements();
-//                d3.selectAll(".attackPreview").remove();
-//                drawPreviews();
-                //d3.select(".bottomMenu").style("pointer-events","initial");
-                d3.selectAll(".line").style("opacity", 0.2);
                 d3.selectAll(".attackPreview").style("border-color", "#fff");
-
             }
 
-            function drawPreview(indexOfPreview) {
+            function social() {
+                mode = 2;
+                removeAllElements();
+                createGraph(0, 4);
+            }
 
-                var attackPreviewDiv = d3.select(".bottomMenu").append("div")
-                        .attr("class", "attackPreview")
-                        .attr("id", "attackPreview_" + indexOfPreview)
-                        .style("width", wAttackPreview + "px")
-                        .style("height", "98%")
-                        .style("position", "relative")
-                        .style("border-color", "white");
+            function drawPreviews() {
+                for (var indexOfPreview = 0; indexOfPreview < totalAttacks.length; indexOfPreview++) {
+                    var attackPreviewDiv = d3.select(".bottomMenu").append("div")
+                            .attr("class", "attackPreview")
+                            .attr("id", "attackPreview_" + indexOfPreview)
+                            .style("width", wAttackPreview + "px")
+                            .style("height", "98%")
+                            .style("position", "relative")
+                            .style("border-color", "white");
 
-                attackPreviewDiv.append("svg")
-                        .style("width", wAttackPreview + "px")
-                        .style("height", hSVGPreview + "px")
-                        .attr("class", "SVGPreview");
-                attackPreviewDiv.append("div")
-                        .attr("id", "attackPreviewHeader_" + indexOfPreview)
-                        .style("height", hPreviewHeaderDiv + "px")
-                        .style("width", wAttackPreview + "px")
-                        .style("position", "absolute")
-                        .style("top", "0px");
-                var svgPreview = attackPreviewDiv.select("svg");
+                    attackPreviewDiv.append("svg")
+                            .style("width", wAttackPreview + "px")
+                            .style("height", hSVGPreview + "px")
+                            .attr("class", "SVGPreview");
+                    attackPreviewDiv.append("div")
+                            .attr("id", "attackPreviewHeader_" + indexOfPreview)
+                            .style("height", hPreviewHeaderDiv + "px")
+                            .style("width", wAttackPreview + "px")
+                            .style("position", "absolute")
+                            .style("top", "0px");
+                    var svgPreview = attackPreviewDiv.select("svg");
 
-                svgPreview.on("click", function () {
-                    //delete temporary accumulate arcs
-                    d3.selectAll("#tempArc").remove();
-                    //if we are in proactive mode we add the graphs on the map
-                    if (mode == 0) {
-                        var div = d3.select(d3.select(this).node().parentNode);
-                        var index = (div.attr("id")).match(/[0-9]+/)[0];
+                    svgPreview.on("click", function () {
+                        //delete temporary accumulate arcs
+                        d3.selectAll("#tempArc").remove();
+                        //if we are in proactive mode we add the graphs on the map
+                        if (mode == 0 || mode == 2) {
+                            var div = d3.select(d3.select(this).node().parentNode);
+                            var index = (div.attr("id")).match(/[0-9]+/)[0];
 
-                        if (div.style("border-top-color") == "rgb(255, 255, 255)") {
-                            div.style("border-color", "yellow");
-                            if (queueSVG.length == 0) {
-                                createChart(index);
-                                createGraph(index, 0);
+                            if (div.style("border-top-color") == "rgb(255, 255, 255)") {
+                                div.style("border-color", "yellow");
+                                if (queueSVG.length == 0) {
+                                    createChart(index);
+                                    createGraph(index, 0);
+                                }
+                                else {
+                                    //set last svg display property to none 
+                                    var last = queueSVG[queueSVG.length - 1];
+                                    d3.select("#svgTable_" + last).attr("display", "none");
+                                    //add new chart
+                                    createChart(index);
+                                    createGraph(index, 0);
+                                }
+                                queueSVG.push(index);
                             }
                             else {
-                                //set last svg display property to none 
-                                var last = queueSVG[queueSVG.length - 1];
-                                d3.select("#svgTable_" + last).attr("display", "none");
-                                //add new chart
-                                createChart(index);
-                                createGraph(index, 0);
-                            }
-                            queueSVG.push(index);
-                        }
-                        else {
-                            div.style("border-color", "white");
-                            removeGraphAndChart(index);
-                            layer.selectAll("#lineStaticAttack" + index).remove();
-                            //delete from list
-                            var indexOfSVG = queueSVG.indexOf(index);
-                            queueSVG.splice(indexOfSVG, 1);
-                            //if the list is not empty, set display property of the last svg to initial
-                            if (queueSVG.length > 0) {
-                                var last = queueSVG[queueSVG.length - 1];
-                                d3.select("#svgTable_" + last).attr("display", "initial");
+                                div.style("border-color", "white");
+                                removeGraphAndChart(index);
+                                layer.selectAll("#lineStaticAttack" + index).remove();
+                                //delete from list
+                                var indexOfSVG = queueSVG.indexOf(index);
+                                queueSVG.splice(indexOfSVG, 1);
+                                //if the list is not empty, set display property of the last svg to initial
+                                if (queueSVG.length > 0) {
+                                    var last = queueSVG[queueSVG.length - 1];
+                                    d3.select("#svgTable_" + last).attr("display", "initial");
+                                }
                             }
                         }
-                    }
-                });
-                drawPreviewGraph(indexOfPreview, svgPreview);
+                    });
+                    drawPreviewGraph(indexOfPreview, svgPreview);
+                }
             }
 
             function replacePoints(string)
@@ -2275,8 +2579,7 @@
                                     //if there are bariers yet, call click() to put them on graph
                                     d3.select("#barrierDetailsHeaderSVGforBarrier").selectAll("g")
                                             .each(function (d, i) {
-                                                var onClickFunc = d3.select(this).on("click");
-                                                onClickFunc.apply(this, [d, i]);
+                                                d3.select(this).on("click").apply(this, [d, i]);
                                             });
                                     //turn rectangle to get screen coordinates
                                     d3.select(this).attr("transform", "translate(" +

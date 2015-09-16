@@ -173,7 +173,7 @@
     	"vulnerabilities":[
     					{"name":"Vulnerability1","patchability":"3","score":"6","base":"4","temporal":"3","environment":"1"}
     	]},
-    {"node":"192.168.4.3","id":"node18","subnet":"192.168.4","lat":"41.96775053374665","long":"12.478633325340129",
+    {"node":"192.168.4.3","id":"node18","subnet":"192.168.4","lat":"41.954852","long":"12.524298",
     	"vulnerabilities":[{"name":"Vulnerability1","patchability":"0","score":"2.3","base":"2","temporal":"3","environment":"1"},
     					{"name":"Vulnerability2","patchability":"4","score":"2.3","base":"1","temporal":"3","environment":"2"}
     	]},

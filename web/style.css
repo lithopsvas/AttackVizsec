@@ -7,9 +7,12 @@ body {
     height: 100%;
     overflow: hidden;
 }
-
 ::-webkit-scrollbar{ width: 0px; }
-
+#zoomPos{
+/*    position: absolute;
+    left: 50%;
+    top: 50%;*/
+}
 .line {
     stroke: #000;
     stroke-width: 2px;
@@ -43,8 +46,10 @@ body {
     stroke: #CC7A29;
 
 }
-
-
+.socialNetworkArc{
+    fill: none;
+    stroke: #C33E00;
+}
 .linePreviewAttack {
     fill: none;
     stroke: #ff6600;
@@ -70,6 +75,9 @@ body {
 
 #perimeterArcMarker{
     fill: #CC7A29;
+}
+#socialNetworkArcMarker{
+    fill: #C33E00;
 }
 
 .overlayedSVG{
@@ -113,11 +121,13 @@ html, #map {
     color: #fff;
 }
 
-.sideMenu {
+.rightMenu, .leftMenu {
     z-index: 3;
     cursor: default;
 }
-
+.topMenu{
+    z-index: 1;
+}
 .bottomMenuContainer {
     z-index: 2;
 }
@@ -136,21 +146,37 @@ html, #map {
     font: 16px sans-serif;
 }
 
-.sideMenuLabel {
+.rightMenuLabel {
     margin: 1px;
     border-radius: 5px;
     border-style: solid;
     border-width: 1px;
     border-color:#E6E6E6;
-    background-image:url(img/button_menu.png)
+    background-image:url(img/attackResponse.svg);
 }
-
-.bottomMenuLabel {
+.leftMenuLabel {
+    margin: 1px;
     border-radius: 5px;
     border-style: solid;
     border-width: 1px;
     border-color:#E6E6E6;
-    background-image:url(img/button_menu.png);
+    background-image:url(img/subnets.svg);
+}
+.bottomMenuLabel {
+    margin: 1px;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color:#E6E6E6;
+    background-image:url(img/ap.svg);
+}
+.topMenuLabel {
+    margin: 1px;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color:#E6E6E6;
+    background-image:url(img/parallelCoordinates.svg);
 }
 
 .tableAttack {
@@ -163,6 +189,12 @@ html, #map {
     margin: 1px;
     padding:5px;
     border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color:#E6E6E6;
+}
+#parallelCoordinates{
+     border-radius: 5px;
     border-style: solid;
     border-width: 1px;
     border-color:#E6E6E6;
@@ -187,10 +219,10 @@ html, #map {
     height: 100%;
 }
 #barrierDetailsHeader{
-    height: 40%
+    height: 28%
 }
 #barrierDetailsBody{
-    height: 60%;
+    height: 72%;
     border-radius: 5px;
     border: 1px dotted white;
     overflow-x: hidden !important;
@@ -376,4 +408,36 @@ html, #map {
     opacity: 0;
     cursor: pointer;
     display: none;
+}
+
+.background path {
+  fill: none;
+  stroke: #777;
+  shape-rendering: crispEdges;
+}
+
+.foreground path {
+  fill: none;
+  stroke: #2BFE1E;
+}
+
+.brush .extent {
+  fill-opacity: .3;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+.axis line,
+.axis path {
+  fill: none;
+  stroke: white;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  /*text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;*/
+}
+#parallelCoordinates svg {
+  font: 12px sans-serif;
+  fill: white
 }
