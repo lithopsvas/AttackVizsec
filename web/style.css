@@ -6,17 +6,17 @@ body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    zoom: 110%;
 }
 ::-webkit-scrollbar{ width: 0px; }
 #zoomPos{
-/*    position: absolute;
-    left: 50%;
-    top: 50%;*/
+    /*    position: absolute;
+        left: 50%;
+        top: 50%;*/
 }
 .line {
     stroke: #000;
     stroke-width: 2px;
-    opacity: 0.2;
 }
 
 .button{
@@ -35,12 +35,20 @@ body {
     stroke: #BF0000;
 }
 
+
 .lineInstantiateOnGoingAttack {
     fill: none;
-    opacity: 0.4;
+    opacity: 0.2;
     stroke: #f00;
+    cursor: default;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
 }
-
+.lineInstantiateOnGoingAttack:hover {
+    opacity: 1;
+}
 .perimeterArc{
     fill: none;
     stroke: #CC7A29;
@@ -121,9 +129,41 @@ html, #map {
     color: #fff;
 }
 
-.rightMenu, .leftMenu {
+.leftMenu {
     z-index: 3;
     cursor: default;
+}
+.rightMenu{
+    z-index: 3;
+    cursor: default;
+    width: 350px;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+#rightMenuContainer{
+    width: 100%;
+    height: 100%;
+}
+.flexcontainer {
+  display: -webkit-flex;
+  display: -moz-flex;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  -moz-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.flexfill {
+  -webkit-flex: 1 1 0%;
+  -moz-flex: 1 1 0%;
+  -ms-flex: 1 1 0%;
+  flex: 1 1 0%;
+}
+#responsePlanDiv{
+    background-color: #3D3D3D;
 }
 .topMenu{
     z-index: 1;
@@ -133,8 +173,8 @@ html, #map {
 }
 .bottomMenu{
     white-space:nowrap;
-    overflow-x: visible;
-    overflow-y: hidden !important;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .attackPreview {
@@ -153,6 +193,7 @@ html, #map {
     border-width: 1px;
     border-color:#E6E6E6;
     background-image:url(img/attackResponse.svg);
+    cursor: pointer;
 }
 .leftMenuLabel {
     margin: 1px;
@@ -161,6 +202,7 @@ html, #map {
     border-width: 1px;
     border-color:#E6E6E6;
     background-image:url(img/subnets.svg);
+    cursor: pointer;
 }
 .bottomMenuLabel {
     margin: 1px;
@@ -169,6 +211,7 @@ html, #map {
     border-width: 1px;
     border-color:#E6E6E6;
     background-image:url(img/ap.svg);
+    cursor: pointer;
 }
 .topMenuLabel {
     margin: 1px;
@@ -177,6 +220,7 @@ html, #map {
     border-width: 1px;
     border-color:#E6E6E6;
     background-image:url(img/parallelCoordinates.svg);
+    cursor: pointer;
 }
 
 .tableAttack {
@@ -194,17 +238,16 @@ html, #map {
     border-color:#E6E6E6;
 }
 #parallelCoordinates{
-     border-radius: 5px;
+    border-radius: 5px;
     border-style: solid;
     border-width: 1px;
     border-color:#E6E6E6;
 }
 #responsePlanHeader{
-    height: 5%;
+    height: 23px;
     text-align: center;
 }
 #responsePlanBody{
-    height: 95%
 }
 #responsePlanHeader p{    
     font-weight: bold;
@@ -216,21 +259,23 @@ html, #map {
     margin: 0;
 }
 #barrierDetailsArea{
-    height: 100%;
 }
 #barrierDetailsHeader{
-    height: 28%
+
 }
-#barrierDetailsBody{
-    height: 72%;
+
+#barrierDetailsBodyContainer{
+    flex: 1 1 auto;
     border-radius: 5px;
     border: 1px dotted white;
     overflow-x: hidden !important;
     overflow-y: auto;
+    position: relative;
 }
-#barrierDetailsHeaderResponsePlanContainer{
-    height: 60%;
-    display: table;
+#barrierDetailsBody{
+    height: 100%;
+    max-height: 100%;
+    position: absolute;
     width: 100%;
 }
 #responsePlanSummary{
@@ -290,13 +335,47 @@ html, #map {
     height: 25px;
     width: 130px;
 }
+#barrierDetailsHeaderResponsePlanContainer{
+    display: table;
+    width: 100%;
+    height: 140px;
+}
+#barrierDetailsHeaderAllBarriersContainer{
+    height: 100px;
+    width: 100%;
+    /*display: table;*/
+     display: none; 
+    border-top: 1px dotted #FFF;
+    /*    overflow-x: auto;
+        overflow-y: hidden;*/
+}
+#barrierDetailsHeaderAllBarriersContainer div{
+    width: 100%;
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+}
+#barrierDetailsHeaderAllBarriersContainer div div{
+    width: 30px;
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+    border:none;
+}
+#barrierDetailsHeaderAllBarriersContainer div div div{
+    width: 12px;
+    height: 60px;
+    display: table-cell;
+    vertical-align: middle;
+    border: 1px solid #7A7A7A;
+    border-radius: 2px;
+}
 #barrierDetailsHeaderBarrierContainer{
-    height: 40%;
+    height: 100px;
     width: 100%;
     display: table;
     border-top: 1px dotted #FFF;
 }
-
 #barrierDetailsHeaderBarrierSummary{
     height: 100%;
     width: 100%;
@@ -333,14 +412,23 @@ html, #map {
     width: 100%;
     border-bottom: 1px solid rgb(104, 104, 104);
     border-top: 1px solid rgb(104, 104, 104);
+
 }
 .detailsItemHeader{
     height: 20px;
     width: 100%;
-    margin-left: 10px;
     cursor: pointer;
     font: 14px sans-serif;
     fill:white;
+    box-sizing: border-box;
+    -moz-transition: all 0.1s;
+    -o-transition: all 0.1;
+    -webkit-transition: all 0.1s;
+    transition: all 0.1s;
+    font-weight: 400;
+}
+.detailsItemHeader:hover{
+    background-color: #cccccc;
 }
 .detailsItemBody {
     height: 100px;
@@ -391,18 +479,36 @@ html, #map {
     height: 25px;
     width: 50px;
     background-color: #606060;
+    border: 2px #FFF solid;
     border-radius: 10px;
-    border-style: solid;
-    border-width: 2px;
-    border-color: #FFF;
     margin-left: 3px;
     color: white;
+    cursor:pointer;
+}
+.detailsItemBodyMitigationData button:disabled, 
+.attackPreview button:disabled, 
+#buttonsDiv button:disabled,
+#barrierDetailsHeaderResponsePlanContainer button:disabled{
+    background-color: #cccccc;
+    color: black;
+}
+.detailsItemBodyMitigationData button:active , 
+.attackPreview button:active , 
+#buttonsDiv button:active ,
+#barrierDetailsHeaderResponsePlanContainer button:active {
+    background-color: #8A8A8A;
+}
+.detailsItemBodyMitigationData button:focus , 
+.attackPreview button:focus , 
+#buttonsDiv button:focus ,
+#barrierDetailsHeaderResponsePlanContainer button:focus {
+    outline:0;
 }
 #buttonsDiv{
     white-space: nowrap;
 }
 .barrierPie path{
-    fill: rgb(236, 139, 57);
+    fill: grey;
     stroke: #000;
     stroke-width: 1px;
     opacity: 0;
@@ -411,33 +517,41 @@ html, #map {
 }
 
 .background path {
-  fill: none;
-  stroke: #777;
-  shape-rendering: crispEdges;
+    fill: none;
+    stroke: #777;
+    shape-rendering: crispEdges;
 }
 
 .foreground path {
-  fill: none;
-  stroke: #2BFE1E;
+    fill: none;
+    stroke: #2BFE1E;
+    cursor:pointer;
 }
 
 .brush .extent {
-  fill-opacity: .3;
-  stroke: #fff;
-  shape-rendering: crispEdges;
+    fill-opacity: .3;
+    stroke: #fff;
+    shape-rendering: crispEdges;
 }
 
 .axis line,
 .axis path {
-  fill: none;
-  stroke: white;
-  shape-rendering: crispEdges;
+    fill: none;
+    stroke: white;
+    shape-rendering: crispEdges;
 }
 
 .axis text {
-  /*text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;*/
+    text-shadow: 0 2px 4px #3d3d3d, 2px 0 4px #3d3d3d, 0 -2px 4px #3d3d3d, -2px 0 4px #3d3d3d;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
 }
 #parallelCoordinates svg {
-  font: 12px sans-serif;
-  fill: white
+    font: 12px sans-serif;
+    fill: white
 }
